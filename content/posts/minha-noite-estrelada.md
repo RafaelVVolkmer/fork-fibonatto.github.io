@@ -3,7 +3,7 @@ title: "Minha Noite Estrelada"
 date: "2025-12-09"
 description: "Um poema que celebra o encontro apaixonado entre o dia e a noite, onde o amor e a paixão queimam no horizonte em labaredas que consomem o tempo."
 ---
-![nosso desejado encontro](public/y.avif)
+![nosso desejado encontro](assets/images/posts/minha-noite-estrelada.avif)
 
 Rompendo o vão do tempo,
 o dia avança
