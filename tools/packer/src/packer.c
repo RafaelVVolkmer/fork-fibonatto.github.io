@@ -253,7 +253,7 @@ int main(int argc, char **argv){
 	}
 	closedir(d);
 
-	qsort(posts, nr_posts, sizeof(struct post), cmp_date);
+	qsort(posts, (size_t)nr_posts, sizeof(struct post), cmp_date);
 
 	printf("/* Blog Index */\n");
 	printf("const struct blog_post posts[] = {\n");
@@ -279,7 +279,7 @@ int main(int argc, char **argv){
 
 	for (i = 0; i < nr_posts; i++)
 		slug_order[i] = i;
-	qsort(slug_order, nr_posts, sizeof(int), cmp_slug_post_index);
+	qsort(slug_order, (size_t)nr_posts, sizeof(int), cmp_slug_post_index);
 
 	printf("static const struct { const char *slug; int index; } post_slug_index[] = {\n");
 	for (i = 0; i < nr_posts; i++) {
@@ -305,7 +305,7 @@ int main(int argc, char **argv){
 	printf("\treturn -1;\n");
 	printf("}\n\n");
 
-	printf("const char *get_article_body(int index)\n{\n");
+	printf("static const char *get_article_body(int index)\n{\n");
 	printf("\tif (index < 0 || index >= posts_count)\n");
 	printf("\t\treturn NULL;\n");
 	printf("\tswitch(index) {\n");

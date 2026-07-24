@@ -66,6 +66,7 @@ static void buf_escape_impl(Buffer *b, const char *str, size_t len) {
             case '>': entity = "&gt;"; break;
             case '"': entity = "&quot;"; break;
             case '\'': entity = "&#39;"; break;
+            default: break;
         }
 
         if (entity) {

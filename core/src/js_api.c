@@ -3,6 +3,13 @@
 #include <emscripten.h>
 #include <string.h>
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
+#pragma clang diagnostic ignored "-Wextra-semi"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+
 // From sys.c
 EM_JS(int, sys_load_theme, (void), {
 	const val = localStorage.getItem('site-theme');
@@ -131,9 +138,10 @@ EM_JS(void, sys_set_meta,
 		      el.setAttribute('content', content);
 	      };
 
-	      const fullUrl = "https://fibonatto.github.io" +
-			      (url.startsWith('/') ? url : '/' + url);
-	      const imgUrl  = "https://fibonatto.github.io/public/SEO.png";
+	      const siteRoot = new URL('.', document.baseURI);
+	      const fullUrl  = new URL(url, siteRoot).href;
+	      const imgUrl =
+		  new URL('assets/images/seo.png', siteRoot).href;
 
 	      setMeta('name', 'description', desc);
 	      setMeta('property', 'og:title', title);
@@ -165,7 +173,8 @@ EM_JS(void, sys_render_footer, (const char *style_ptr, const char *url_ptr), {
 
 	const row = document.createElement('div');
 	row.style.cssText =
-	    'display:flex;justify-content:space-between;align-items:center;gap:16px;';
+	    'display:flex;justify-content:space-between;align-items:center;'
+	    + 'gap:16px;flex-wrap:wrap;';
 
 	const meta = document.createElement('div');
 	meta.style.cssText =
@@ -193,7 +202,34 @@ EM_JS(void, sys_render_footer, (const char *style_ptr, const char *url_ptr), {
 	github.textContent   = 'GitHub';
 
 	meta.append(copyright, dot1, vim, dot2, github);
-	row.appendChild(meta);
+
+	const artifactNav = document.createElement('nav');
+	artifactNav.setAttribute('aria-label', 'Site artifacts');
+	artifactNav.style.cssText =
+	    'font-size:14px;display:flex;justify-content:flex-end;gap:12px;'
+	    + 'flex-wrap:wrap;';
+
+	const siteRoot = new URL('.', document.baseURI);
+	const artifacts = [
+		['Sitemap', 'sitemap.xml'],
+		['Robots', 'robots.txt'],
+		['CycloneDX', '.metadata/sbom.cyclonedx.json'],
+		['SPDX', '.metadata/sbom.spdx.json'],
+		['Cosign', '.metadata/cosign.status.json'],
+		['REUSE', 'REUSE.toml'],
+		['License', 'LICENSES/MIT.txt'],
+	];
+
+	for (const [label, path] of artifacts) {
+		const link	     = document.createElement('a');
+		link.href	     = new URL(path, siteRoot).href;
+		link.style.cssText =
+		    'color:var(--text-color);text-decoration:none;';
+		link.textContent = label;
+		artifactNav.appendChild(link);
+	}
+
+	row.append(meta, artifactNav);
 	outer.appendChild(row);
 	footer.replaceChildren(outer);
 });
@@ -407,3 +443,7 @@ EM_JS(void, update_theme_toggle_label,
 	if (btn)
 		btn.textContent = label;
 });
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

@@ -40,19 +40,6 @@ static void skip_ws(MathParser *p) {
 	while (p->cur < p->end && is_space_uc((unsigned char)*p->cur)) p->cur++;
 }
 
-static bool peek(MathParser *p, char c) {
-	skip_ws(p);
-	return p->cur < p->end && *p->cur == c;
-}
-
-static bool match(MathParser *p, char c) {
-	if (peek(p, c)) {
-		p->cur++;
-		return true;
-	}
-	return false;
-}
-
 static void parse_expr(MathParser *p);
 
 static bool match_cmd(MathParser *p, const char *s) {

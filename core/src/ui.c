@@ -58,7 +58,8 @@ void add_image(const char *path, size_t path_len, const char *alt, size_t alt_le
 	if (is_lcp) buf_append(&g_html_buf, " data-lcp=\"1\"");
 	if (width > 0) buf_printf(&g_html_buf, " data-width=\"%d\"", width);
 	if (height > 0) buf_printf(&g_html_buf, " data-height=\"%d\"", height);
-	if (scale > 0 && scale != 1.0f) buf_printf(&g_html_buf, " data-scale=\"%f\"", scale);
+	if (scale > 0 && scale != 1.0f)
+		buf_printf(&g_html_buf, " data-scale=\"%f\"", (double)scale);
 
 	buf_append(&g_html_buf, "></span></p>");
 }
@@ -81,7 +82,9 @@ void add_bar(int h, int w, const float *pcts, const char **colors, const float *
 		if (!is_safe_css_var_name(colors[i]))
 			continue;
 
-		buf_printf(&g_html_buf, "<div style=\"height:%.1f%%;opacity:%.2f;", pcts[i] * 100.0f, opacities[i]);
+		buf_printf(&g_html_buf,
+			   "<div style=\"height:%.1f%%;opacity:%.2f;",
+			   (double)(pcts[i] * 100.0f), (double)opacities[i]);
 		if (styles[i] == BAR_SEG_HATCHED) {
 			buf_append(&g_html_buf, "background-image:repeating-linear-gradient(45deg,transparent,transparent 2px,var(");
 			buf_append(&g_html_buf, colors[i]);
@@ -136,6 +139,13 @@ void ui_render_header(void) {
                  "nav-right-group");
 }
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
+#pragma clang diagnostic ignored "-Wextra-semi"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+
 EM_JS(void, add_nav_group, (const char *id, const char *container_id, const char *style), {
     const parent = document.getElementById(UTF8ToString(container_id));
     if (!parent) return;
@@ -145,6 +155,10 @@ EM_JS(void, add_nav_group, (const char *id, const char *container_id, const char
     div.setAttribute('style', UTF8ToString(style));
     parent.appendChild(div);
 });
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 EMSCRIPTEN_KEEPALIVE
 void ui_toggle_theme(void) {
@@ -161,5 +175,7 @@ void ui_toggle_theme(void) {
 
 void ui_init_router(void) { sys_init_router(); }
 void ui_sync_url(const char *path) { sys_update_url(path); }
-void ui_get_current_hash(char *buf, int max_len) { sys_get_url_hash(buf, max_len); }
+void ui_get_current_hash(char *buf, size_t max_len) {
+	sys_get_url_hash(buf, max_len);
+}
 void update_seo_metadata(const char *t, const char *d, const char *u) { sys_set_meta(t, d, u); }

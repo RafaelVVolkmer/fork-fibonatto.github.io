@@ -94,7 +94,7 @@ void ui_sync_url(const char *path);
 /*
  * ui_get_current_hash - Returns the current URL hash into the provided buffer.
  */
-void ui_get_current_hash(char *buf, int max_len);
+void ui_get_current_hash(char *buf, size_t max_len);
 
 /*
  * add_bar - Appends a segmented graph bar to the UI.

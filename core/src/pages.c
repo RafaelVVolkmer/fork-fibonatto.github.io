@@ -18,10 +18,10 @@ void page_render_home(void) {
 }
 
 void page_render_blog(void) {
-	const char *header = "Blog Index";
+	const char *blog_heading = "Blog Index";
 	int i;
 
-	add_paragraph(header, strlen(header));
+	add_paragraph(blog_heading, strlen(blog_heading));
 	for (i = 0; i < posts_count; i++) {
 		add_blog_entry(posts[i].title, posts[i].date, posts[i].slug);
 	}

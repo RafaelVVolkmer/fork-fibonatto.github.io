@@ -5,8 +5,13 @@
 #include "ui.h"
 #include "config.h"
 #include "contents_data.h"
+#include "markdown.h"
 #include "math.h"
 #include "buffer.h"
+
+static size_t span_length(const char *begin, const char *end) {
+	return end >= begin ? (size_t)(end - begin) : 0U;
+}
 
 static bool is_digit_ascii(char c) {
 	return c >= '0' && c <= '9';
@@ -142,7 +147,7 @@ void render_text(const char *text, size_t len) {
 	while (p < end) {
 		if (*p == '$') {
 			if (p > start) {
-				buf_escape(&g_html_buf, start, p - start);
+				buf_escape(&g_html_buf, start, span_length(start, p));
 			}
 
 			bool display = false;
@@ -157,13 +162,15 @@ void render_text(const char *text, size_t len) {
 			if (display) {
 				math_end = find_display_math_end(p, end);
 				if (math_end) {
-					math_to_mathml(&g_html_buf, math_start, math_end - math_start, true);
+					math_to_mathml(&g_html_buf, math_start,
+						       span_length(math_start, math_end), true);
 					p = math_end + 2;
 				}
 			} else {
 				math_end = find_inline_math_end(p, end);
 				if (math_end) {
-					math_to_mathml(&g_html_buf, math_start, math_end - math_start, false);
+					math_to_mathml(&g_html_buf, math_start,
+						       span_length(math_start, math_end), false);
 					p = math_end + 1;
 				}
 			}
@@ -183,7 +190,7 @@ void render_text(const char *text, size_t len) {
 	}
 
 	if (p > start) {
-		buf_escape(&g_html_buf, start, p - start);
+		buf_escape(&g_html_buf, start, span_length(start, p));
 	}
 }
 
@@ -222,11 +229,13 @@ static void render_line(const char *line, size_t len) {
 			break;
 
 		const char *url_s = alt_e + 2;
-		const char *url_e = memchr(url_s, ')', len - (url_s - line));
+		size_t url_offset = span_length(line, url_s);
+		const char *url_e = memchr(url_s, ')', len - url_offset);
 		if (!url_e)
 			break;
 
-		add_image(url_s, url_e - url_s, alt_s, alt_e - alt_s, 1.0f, 0, 0, 0);
+		add_image(url_s, span_length(url_s, url_e), alt_s,
+			  span_length(alt_s, alt_e), 1.0f, 0, 0, 0);
 		return;
 	}
 	case '[': {
@@ -237,9 +246,11 @@ static void render_line(const char *line, size_t len) {
 		if (!p || p + 1 >= line + len || p[1] != ']')
 			break;
 
-		render_graph_shortcode(line + 8, (p - line) - 8);
+		render_graph_shortcode(line + 8, span_length(line + 8, p));
 		return;
 	}
+	default:
+		break;
 	}
 
 	buf_append(&g_html_buf, "<p class=\"para\">");
@@ -278,7 +289,7 @@ void render_markdown(const char *content) {
 				code_start = next ? next + 1 : NULL;
 			} else {
 				if (code_start) {
-					size_t clen = cur - code_start;
+					size_t clen = span_length(code_start, cur);
 					if (clen > 0 && code_start[clen - 1] == '\n') clen--;
 					add_code_block((struct str_view){lang_start, lang_len}, (struct str_view){code_start, clen});
 				}
@@ -291,7 +302,7 @@ void render_markdown(const char *content) {
 					math_start = next ? next + 1 : NULL;
 				} else {
 					if (math_start && cur > math_start) {
-						size_t mlen = cur - math_start;
+						size_t mlen = span_length(math_start, cur);
 						while (mlen > 0 && (math_start[mlen - 1] == '\n' || math_start[mlen - 1] == '\r')) {
 							mlen--;
 						}
