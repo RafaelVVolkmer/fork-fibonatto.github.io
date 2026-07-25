@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+version = 1
+
+[[annotations]]
+path = [
+  ".brotli-version",
+  ".cosign-version",
+  ".emscripten-version",
+  ".syft-version",
+  ".terser-version",
+  "assets/**",
+  "compile_commands.json",
+  "content/posts/**",
+  "core/**",
+  "dist/**",
+  "docker/terser/package.json",
+  "docker/terser/package-lock.json",
+  "lint/emscripten.h",
+  "lint/versions.json",
+  "site/static/.nojekyll",
+  "site/static/google0d6f4c8219a52398.html",
+  "tools/packer/inc/**",
+  "tools/packer/src/**",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Sergio Bonatto"
+SPDX-License-Identifier = "MIT"
+
+# EOF
