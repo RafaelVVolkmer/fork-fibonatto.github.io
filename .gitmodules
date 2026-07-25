@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+[submodule "tools/emsdk"]
+	path = tools/emsdk
+	url = https://github.com/emscripten-core/emsdk.git
+	shallow = true
+[submodule "tools/brotli"]
+	path = tools/brotli
+	url = https://github.com/google/brotli.git
+	shallow = true
+
+# EOF

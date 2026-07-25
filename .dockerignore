@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+.build
+.cache
+.git
+.github
+.gitignore
+compile_commands.json
+dist
+logs
+node_modules
+coverage
+out
+tools/brotli
+tools/emsdk
+
+docker/compose.yml
+
+*.a
+*.d
+*.log
+*.o
+*.obj
+*.so
+
+# EOF
