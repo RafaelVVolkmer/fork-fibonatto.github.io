@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+include = ["lint/**/*.toml"]
+
+[formatting]
+align_comments = true
+align_entries = false
+array_auto_collapse = false
+compact_arrays = false
+compact_inline_tables = false
+indent_entries = false
+indent_string = "  "
+reorder_keys = false
+trailing_newline = true
+
+# EOF

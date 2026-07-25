@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+accept = [
+  "100..=103",
+  "200..=299",
+  "429",
+]
+cache = false
+exclude = [
+  "^mailto:",
+  "^https://fibonatto\\.github\\.io/",
+]
+exclude_path = [
+  "^\\.build/",
+  "^dist/",
+  "^tools/brotli/",
+  "^tools/emsdk/",
+]
+max_concurrency = 8
+max_retries = 3
+no_progress = true
+remap = [
+  "content/posts/assets/ assets/",
+]
+timeout = 30
+
+# EOF

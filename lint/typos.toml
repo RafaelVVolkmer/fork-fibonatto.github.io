@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+[files]
+extend-exclude = [
+  ".build/**",
+  "assets/**",
+  "content/posts/**",
+  "dist/**",
+  "tools/brotli/**",
+  "tools/emsdk/**",
+]
+
+[default]
+locale = "en-us"
+
+[default.extend-identifiers]
+Agoriz = "Agoriz"
+Bonatto = "Bonatto"
+clen = "clen"
+EHS = "EHS"
+emcc = "emcc"
+emmalloc = "emmalloc"
+emsdk = "emsdk"
+MathML = "MathML"
+noexecstack = "noexecstack"
+wasm = "wasm"
+
+[default.extend-words]
+flate = "flate"
+nd = "nd"
+ser = "ser"
+
+# EOF

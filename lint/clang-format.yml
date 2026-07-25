@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+# Formatting remains intentionally disabled until the dedicated source-format
+# change. The check still verifies that every C/H input and this configuration
+# can be parsed by clang-format.
+BasedOnStyle: LLVM
+DisableFormat: true
+SortIncludes: Never
+
+# EOF

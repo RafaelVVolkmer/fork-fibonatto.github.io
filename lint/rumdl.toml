@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+[global]
+disable = [
+  "MD013",
+  "MD024",
+  "MD025",
+  "MD033",
+  "MD034",
+  "MD036",
+  "MD041",
+]
+exclude = [
+  ".build/**",
+  "dist/**",
+  "tools/brotli/**",
+  "tools/emsdk/**",
+]
+include = [
+  "README.md",
+  "lint/**/*.md",
+]
+respect_gitignore = true
+
+# EOF

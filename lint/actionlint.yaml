@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+self-hosted-runner:
+  labels: []
+
+# EOF

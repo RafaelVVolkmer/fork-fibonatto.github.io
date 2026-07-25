@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+Checks: >-
+  -*,
+  clang-analyzer-core.*,
+  clang-analyzer-nullability.*
+WarningsAsErrors: "*"
+HeaderFilterRegex: "^(core|tools/packer)/(inc|src)/"
+FormatStyle: none
+SystemHeaders: false
+
+# EOF

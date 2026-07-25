@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+check-for-app-update: false
+
+format:
+  pretty: true
+
+file:
+  metadata:
+    selection: all
+    digests:
+      - sha256
+
+# EOF

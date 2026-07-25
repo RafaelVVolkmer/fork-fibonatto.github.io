@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+severity=warning
+external-sources=true
+source-path=SCRIPTDIR
