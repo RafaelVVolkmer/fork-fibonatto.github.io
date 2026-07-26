@@ -1,0 +1,126 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+name: ehs
+
+x-runtime-build: &runtime-build
+  context: ..
+  dockerfile: docker/Dockerfile
+  target: runtime
+  args:
+    EMSDK_IMAGE: ${EMSDK_IMAGE:-emscripten/emsdk:6.0.4@sha256:3a0d11e50f072dc2c4bc92e3b05ab1340fb7d4dd152f80b8af35fc1c6f15e644}
+    ALPINE_IMAGE: ${ALPINE_IMAGE:-alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40}
+    NGINX_IMAGE: ${NGINX_IMAGE:-nginxinc/nginx-unprivileged:1.28.1-alpine-slim@sha256:ce7786ca8aeaa99d6633bc65346b2dca33b098d41a1b670dcf78bb8f1489eded}
+    VERSION: ${VERSION:-0.0.0-local}
+    VCS_REF: ${VCS_REF:-unknown}
+    BUILD_DATE: ${BUILD_DATE:-unknown}
+
+x-runtime-service: &runtime-service
+  image: ehs-runtime:local
+  build: *runtime-build
+  restart: unless-stopped
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  pids_limit: 64
+  mem_limit: 64m
+  cpus: 0.50
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+  expose:
+    - "8080"
+  networks:
+    - backend
+  stop_grace_period: 10s
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "3"
+
+services:
+  certgen:
+    image: ehs-certgen:local
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: certgen
+      args:
+        ALPINE_IMAGE: ${ALPINE_IMAGE:-alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40}
+    restart: "no"
+    network_mode: none
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=4m,mode=1777
+    volumes:
+      - tls-certs:/certs
+
+  app-a:
+    <<: *runtime-service
+
+  app-b:
+    <<: *runtime-service
+
+  edge:
+    image: ehs-edge:local
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: edge
+      args:
+        ALPINE_IMAGE: ${ALPINE_IMAGE:-alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40}
+        NGINX_IMAGE: ${NGINX_IMAGE:-nginxinc/nginx-unprivileged:1.28.1-alpine-slim@sha256:ce7786ca8aeaa99d6633bc65346b2dca33b098d41a1b670dcf78bb8f1489eded}
+        VERSION: ${VERSION:-0.0.0-local}
+        VCS_REF: ${VCS_REF:-unknown}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+    restart: unless-stopped
+    depends_on:
+      certgen:
+        condition: service_completed_successfully
+      app-a:
+        condition: service_healthy
+      app-b:
+        condition: service_healthy
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 1.00
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=96m,mode=1777
+    volumes:
+      - tls-certs:/etc/nginx/tls:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8443:8443"
+    networks:
+      - frontend
+      - backend
+    stop_grace_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+networks:
+  frontend:
+  backend:
+    internal: true
+
+volumes:
+  tls-certs:
+
+# EOF

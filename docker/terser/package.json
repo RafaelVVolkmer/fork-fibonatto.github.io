@@ -1,0 +1,9 @@
+{
+  "name": "ehs-container-build-tools",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "dependencies": {
+    "terser": "5.49.0"
+  }
+}
