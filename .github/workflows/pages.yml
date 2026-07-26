@@ -1,0 +1,236 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+name: Verify and deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          lfs: true
+          submodules: recursive
+
+      - name: Install system lint prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            build-essential \
+            ca-certificates \
+            clang-format \
+            clang-tidy \
+            cppcheck \
+            curl \
+            emscripten \
+            gzip \
+            jq \
+            libdigest-sha-perl \
+            shellcheck \
+            tar \
+            yamllint
+
+      - name: Install pinned standalone linters
+        env:
+          LINT_BIN_DIR: ${{ runner.temp }}/ehs-lint-bin
+        run: |
+          ./lint/install-tools.sh
+          echo "${LINT_BIN_DIR}" >> "${GITHUB_PATH}"
+
+      - name: Run the complete lint gate
+        run: make lint
+
+  package:
+    name: Test and package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    needs: lint
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          lfs: true
+          submodules: recursive
+
+      - name: Restore project toolchain caches
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: |
+            .cache
+            tools/emsdk/.emscripten
+            tools/emsdk/java
+            tools/emsdk/node
+            tools/emsdk/python
+            tools/emsdk/upstream
+          key: >-
+            ehs-toolchains-${{ runner.os }}-${{
+            hashFiles(
+            '.brotli-version',
+            '.cosign-version',
+            '.emscripten-version',
+            '.gitmodules',
+            '.syft-version'
+            ) }}
+
+      - name: Install system build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            build-essential \
+            ca-certificates \
+            clang \
+            cmake \
+            curl \
+            gzip \
+            jq \
+            libdigest-sha-perl \
+            tar
+
+      - name: Read pinned tool versions
+        id: versions
+        run: |
+          {
+            echo "terser=$(sed -n '1p' .terser-version)"
+            echo "syft=v$(sed -n '1p' .syft-version)"
+            echo "cosign=v$(sed -n '1p' .cosign-version)"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Install pinned Terser
+        run: npm install --global "terser@${{ steps.versions.outputs.terser }}"
+
+      - name: Install Syft
+        id: syft
+        uses: anchore/sbom-action/download-syft@e22c389904149dbc22b58101806040fa8d37a610  # v0.24.0
+        with:
+          syft-version: ${{ steps.versions.outputs.syft }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6  # v4.1.2
+        with:
+          cosign-release: ${{ steps.versions.outputs.cosign }}
+
+      - name: Build and verify the complete release
+        env:
+          REQUIRE_SBOM: "1"
+          REQUIRE_SIGNATURE: >-
+            ${{ (github.ref == 'refs/heads/main' ||
+            github.ref == 'refs/heads/develop') &&
+            github.event_name != 'pull_request' && '1' || '0' }}
+          RUN_LINT: "0"
+          SANITIZER_CC: clang
+          SBOM_SOURCE_NAME: ${{ github.repository }}
+          SBOM_SOURCE_VERSION: ${{ github.sha }}
+          SYFT: ${{ steps.syft.outputs.cmd }}
+        run: |
+          make release \
+            USE_BUNDLED_EMSDK=1 \
+            USE_BUNDLED_BROTLI=1
+
+      - name: Scan repository dependencies and secrets
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+
+      - name: Scan generated SBOMs
+        run: |
+          for sbom in \
+            dist/.metadata/sbom.cyclonedx.json \
+            dist/.metadata/sbom.spdx.json; do
+            trivy sbom \
+              --scanners vuln \
+              --severity HIGH,CRITICAL \
+              --ignore-unfixed \
+              --exit-code 1 \
+              "${sbom}"
+          done
+
+      - name: Upload Pages artifact
+        if: >-
+          github.event_name != 'pull_request' &&
+          (github.ref == 'refs/heads/main' ||
+          github.ref == 'refs/heads/develop')
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    if: >-
+      github.event_name != 'pull_request' &&
+      (github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/develop')
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    needs: package
+    permissions:
+      pages: write
+      id-token: write
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128  # v5.0.0
+
+  smoke:
+    name: Post-deploy smoke test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    needs: deploy
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout smoke test
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Install pinned Playwright
+        run: |
+          npm install \
+            --no-save \
+            --no-package-lock \
+            --ignore-scripts \
+            playwright@1.61.1
+          npx playwright install --with-deps chromium
+
+      - name: Verify the deployed site
+        run: node scripts/tests/smoke-pages.mjs "${{ needs.deploy.outputs.page_url }}"
+
+# EOF
