@@ -7,7 +7,7 @@
 # these arguments deliberately when updating a base image.
 ARG EMSDK_IMAGE="emscripten/emsdk:6.0.4@sha256:3a0d11e50f072dc2c4bc92e3b05ab1340fb7d4dd152f80b8af35fc1c6f15e644"
 ARG ALPINE_IMAGE="alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40"
-ARG NGINX_IMAGE="nginxinc/nginx-unprivileged:1.28.1-alpine-slim@sha256:ce7786ca8aeaa99d6633bc65346b2dca33b098d41a1b670dcf78bb8f1489eded"
+ARG NGINX_IMAGE="nginxinc/nginx-unprivileged:1.30.4-alpine-slim@sha256:e88d990b349df8cf4aa82f16642d7a23375016638c9ace4e5c6ca25028e62e65"
 
 # ==============================================================================
 # 1. Compile the current Make-based release artifact

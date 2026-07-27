@@ -11,7 +11,7 @@ x-runtime-build: &runtime-build
   args:
     EMSDK_IMAGE: ${EMSDK_IMAGE:-emscripten/emsdk:6.0.4@sha256:3a0d11e50f072dc2c4bc92e3b05ab1340fb7d4dd152f80b8af35fc1c6f15e644}
     ALPINE_IMAGE: ${ALPINE_IMAGE:-alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40}
-    NGINX_IMAGE: ${NGINX_IMAGE:-nginxinc/nginx-unprivileged:1.28.1-alpine-slim@sha256:ce7786ca8aeaa99d6633bc65346b2dca33b098d41a1b670dcf78bb8f1489eded}
+    NGINX_IMAGE: ${NGINX_IMAGE:-nginxinc/nginx-unprivileged:1.30.4-alpine-slim@sha256:e88d990b349df8cf4aa82f16642d7a23375016638c9ace4e5c6ca25028e62e65}
     VERSION: ${VERSION:-0.0.0-local}
     VCS_REF: ${VCS_REF:-unknown}
     BUILD_DATE: ${BUILD_DATE:-unknown}
@@ -78,7 +78,7 @@ services:
       target: edge
       args:
         ALPINE_IMAGE: ${ALPINE_IMAGE:-alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40}
-        NGINX_IMAGE: ${NGINX_IMAGE:-nginxinc/nginx-unprivileged:1.28.1-alpine-slim@sha256:ce7786ca8aeaa99d6633bc65346b2dca33b098d41a1b670dcf78bb8f1489eded}
+        NGINX_IMAGE: ${NGINX_IMAGE:-nginxinc/nginx-unprivileged:1.30.4-alpine-slim@sha256:e88d990b349df8cf4aa82f16642d7a23375016638c9ace4e5c6ca25028e62e65}
         VERSION: ${VERSION:-0.0.0-local}
         VCS_REF: ${VCS_REF:-unknown}
         BUILD_DATE: ${BUILD_DATE:-unknown}
