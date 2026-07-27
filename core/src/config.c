@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Sergio Bonatto
+// SPDX-License-Identifier: MIT
+
 #include "config.h"
 
 const struct timing_config timing = {.tick_delta = 0.016f};

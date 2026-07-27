@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Sergio Bonatto
+// SPDX-License-Identifier: MIT
+
 #ifndef TOOLS_PACKER_H
 #define TOOLS_PACKER_H
 

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Sergio Bonatto
+// SPDX-License-Identifier: MIT
+
 #ifndef PROJECT_SRC_ROUTER_H
 #define PROJECT_SRC_ROUTER_H
 

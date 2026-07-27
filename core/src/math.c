@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Sergio Bonatto
+// SPDX-License-Identifier: MIT
+
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Sergio Bonatto
+// SPDX-License-Identifier: MIT
+
 #ifndef EHS_LINT_EMSCRIPTEN_H
 #define EHS_LINT_EMSCRIPTEN_H
 
