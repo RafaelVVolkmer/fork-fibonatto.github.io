@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+User-agent: *
+Allow: /
+
+Sitemap: {{SITE_URL}}/sitemap.xml

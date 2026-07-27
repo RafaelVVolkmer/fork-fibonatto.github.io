@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+https://rafaelvvolkmer.github.io/fork-fibonatto.github.io

@@ -1,13 +1,29 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+# Generated build and deployment output
+/.build/
+/dist/
+/logs/
+/compile_commands.json
+/.reuse/
+/.rumdl_cache/
+/node_modules/
+
+# Editor and language-server state
+/.cache/
+/.vscode/
+/.vscode-ctags
+/.idea/
+/.exrc
+/tags
+/.tags
+**/.zennotes/
+
+# Compiler diagnostics and local metadata
+/*.plist
+
 # OS-specific files
 .DS_Store
 
-# Explicitly include the build directory even if global rules ignore it
-!build/
-build/emcache/
-
-.cache/
-.vscode
-.exrc
-.clangd
-.clang-format
-.tags
+# EOF
