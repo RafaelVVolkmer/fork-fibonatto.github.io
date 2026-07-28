@@ -51,11 +51,9 @@ jobs:
           key: >-
             ehs-toolchains-${{ runner.os }}-${{
             hashFiles(
-            '.brotli-version',
-            '.cosign-version',
-            '.emscripten-version',
             '.gitmodules',
-            '.syft-version'
+            'static_analysis/versions.json',
+            'toolchain-versions.yml'
             ) }}
 
       - name: Install system lint prerequisites
@@ -117,11 +115,9 @@ jobs:
           key: >-
             ehs-toolchains-${{ runner.os }}-${{
             hashFiles(
-            '.brotli-version',
-            '.cosign-version',
-            '.emscripten-version',
             '.gitmodules',
-            '.syft-version'
+            'static_analysis/versions.json',
+            'toolchain-versions.yml'
             ) }}
 
       - name: Install system build prerequisites
@@ -142,9 +138,9 @@ jobs:
         id: versions
         run: |
           {
-            echo "terser=$(sed -n '1p' .terser-version)"
-            echo "syft=v$(sed -n '1p' .syft-version)"
-            echo "cosign=v$(sed -n '1p' .cosign-version)"
+            echo "terser=$(./scripts/read-version.sh terser)"
+            echo "syft=v$(./scripts/read-version.sh syft)"
+            echo "cosign=v$(./scripts/read-version.sh cosign)"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Install pinned Terser

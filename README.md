@@ -68,7 +68,7 @@ sudo apt-get install \
   build-essential clang-format clang-tidy cmake cppcheck curl git-lfs jq \
   shellcheck yamllint
 git lfs install
-npm install --global "terser@$(sed -n '1p' .terser-version)"
+npm install --global "terser@$(./scripts/read-version.sh terser)"
 ./scripts/install-tools.sh
 ```
 
@@ -79,7 +79,7 @@ brew install \
   actionlint cmake cppcheck git-lfs jq llvm lychee rumdl shellcheck shfmt \
   taplo typos yamllint
 git lfs install
-npm install --global "terser@$(sed -n '1p' .terser-version)"
+npm install --global "terser@$(./scripts/read-version.sh terser)"
 ```
 
 The standalone installer places executables in `.cache/lint/bin`, which the
@@ -89,15 +89,15 @@ through their package manager.
 
 Emscripten, Binaryen, and the Brotli CLI are optional system dependencies. When
 `emcc` or `wasm-opt` is unavailable, Make initializes `tools/emsdk`, installs
-the version pinned in `.emscripten-version`, and invokes the repository-local
-tools. When `brotli` is unavailable, Make initializes `tools/brotli` and builds
-the version pinned in `.brotli-version` with CMake inside
+the Emscripten version pinned in `toolchain-versions.yml`, and invokes the
+repository-local tools. When `brotli` is unavailable, Make initializes
+`tools/brotli` and builds the pinned Brotli version with CMake inside
 `.cache/toolchains/brotli`. When the system Terser is absent or has another
 version, `npm ci` materializes the exact `docker/terser/package-lock.json`
 dependency graph inside `.cache/toolchains/terser`.
 
-Each fallback checks its own marker file. If a required submodule is absent or
-empty, the corresponding bootstrap runs:
+Each fallback reads the shared `toolchain-versions.yml`. If a required
+submodule is absent or empty, the corresponding bootstrap runs:
 
 ```sh
 git submodule update --init --recursive --depth 1 -- tools/<name>
@@ -252,7 +252,7 @@ processes belong to the same top-level log and do not create duplicates. A
 `clean`, `logs-clean`, `distclean`, or `dist-clean` invocation is intentionally
 never logged.
 
-`make sbom` uses the Syft version pinned in `.syft-version` when it is
+`make sbom` uses the Syft version pinned in `toolchain-versions.yml` when it is
 available on `PATH` (or supplied through `SYFT=/path/to/syft`). If Syft is not
 installed, the release prints a warning and continues without SBOMs. A
 different installed version also produces a warning. The Pages workflow always
@@ -355,6 +355,7 @@ available to Emscripten's compiler, runtime settings, `wasm-ld`, and Binaryen.
 ├── scripts/                Build, audit, packaging, and validation helpers
 ├── mk/                     Ordered GNU Make configuration and build fragments
 ├── static_analysis/        Analysis policies grouped by source domain
+├── toolchain-versions.yml  Shared build and release tool version pins
 ├── logs/                   Ignored per-profile Make invocation logs
 ├── .github/workflows/      GitHub Pages build and deployment
 ├── .build/                 Disposable generated headers and intermediates

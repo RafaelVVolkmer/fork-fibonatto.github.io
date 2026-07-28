@@ -7,9 +7,8 @@
 
 $(AUDIT_STAMP): \
 		$(MAKE_CONFIG_FILES) \
-		.emscripten-version \
-		.brotli-version \
-		.terser-version \
+		$(VERSION_MANIFEST) \
+		$(VERSION_TOOL) \
 		$(PACKER_DIR)/Makefile \
 		scripts/build.sh \
 		scripts/toolchain.sh | $(AUDIT_DIR) check-tools
@@ -36,9 +35,8 @@ $(AUDIT_STAMP): \
 
 $(DEBUG_AUDIT_STAMP): \
 		$(MAKE_CONFIG_FILES) \
-		.emscripten-version \
-		.brotli-version \
-		.terser-version \
+		$(VERSION_MANIFEST) \
+		$(VERSION_TOOL) \
 		$(PACKER_DIR)/Makefile \
 		scripts/build.sh \
 		scripts/toolchain.sh | $(AUDIT_DIR) check-tools

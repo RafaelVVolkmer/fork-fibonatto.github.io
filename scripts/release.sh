@@ -177,7 +177,7 @@ generate_sboms() {
 	local spdx_tmp="$work_dir/sbom.spdx.json"
 	local output
 
-	expected_version="${SYFT_VERSION:-$(sed -n '1p' "$project_root/.syft-version")}"
+	expected_version="${SYFT_VERSION:-$("$project_root/scripts/read-version.sh" syft)}"
 	[[ -d "$dist_dir" ]] || {
 		echo "dist/ does not exist; build the site before generating SBOMs." >&2
 		exit 1
@@ -251,7 +251,7 @@ finalize_metadata() {
 	local cosign="${COSIGN:-cosign}"
 	local expected_version actual_version=""
 
-	expected_version="$(sed -n '1p' "$project_root/.cosign-version")"
+	expected_version="$("$project_root/scripts/read-version.sh" cosign)"
 	[[ -d "$dist_dir" && -f "$release_log" ]] || {
 		echo "Release output or its build log is missing." >&2
 		exit 1

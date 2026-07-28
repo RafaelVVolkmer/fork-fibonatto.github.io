@@ -21,6 +21,8 @@ AUDIT_DIR := $(BUILD_DIR)/audit
 DEBUG_DIR := $(BUILD_DIR)/debug
 DIST_DIR := dist
 COMPILATION_DATABASE := compile_commands.json
+VERSION_MANIFEST := toolchain-versions.yml
+VERSION_TOOL := scripts/read-version.sh
 CACHE_ROOT := .cache
 EMSCRIPTEN_CACHE_DIR := $(CACHE_ROOT)/emscripten
 TOOLCHAIN_CACHE_DIR := $(CACHE_ROOT)/toolchains
@@ -68,10 +70,10 @@ SITE_SOURCES := $(sort $(shell find $(SITE_DIR) -type f 2>/dev/null))
 # USE_BUNDLED_BROTLI=1 force reproducible repository-local toolchains.
 # -----------------------------------------------------------------------------
 
-EMSDK_VERSION := $(strip $(shell sed -n '1p' .emscripten-version))
-BROTLI_VERSION := $(strip $(shell sed -n '1p' .brotli-version))
-TERSER_VERSION := $(strip $(shell sed -n '1p' .terser-version))
-SYFT_VERSION := $(strip $(shell sed -n '1p' .syft-version))
+EMSDK_VERSION := $(strip $(shell ./$(VERSION_TOOL) emscripten))
+BROTLI_VERSION := $(strip $(shell ./$(VERSION_TOOL) brotli))
+TERSER_VERSION := $(strip $(shell ./$(VERSION_TOOL) terser))
+SYFT_VERSION := $(strip $(shell ./$(VERSION_TOOL) syft))
 USE_BUNDLED_EMSDK ?= 0
 USE_BUNDLED_BROTLI ?= 0
 USE_BUNDLED_TERSER ?= 0

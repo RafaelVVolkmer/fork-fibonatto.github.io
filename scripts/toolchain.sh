@@ -54,7 +54,7 @@ ensure_submodule() {
 # ------------------------------------------------------------------------------
 ensure_emsdk() {
 	local emsdk_dir="$project_root/tools/emsdk"
-	local version="${EMSDK_VERSION:-$(sed -n '1p' "$project_root/.emscripten-version")}"
+	local version="${EMSDK_VERSION:-$("$project_root/scripts/read-version.sh" emscripten)}"
 	local stamp_dir="$project_root/.cache/toolchains"
 	local stamp="$stamp_dir/emsdk-$version.stamp"
 	local sdk_ready=0
@@ -123,7 +123,7 @@ ensure_brotli() {
 	local actual_version source_revision expected_stamp current_stamp
 	local stamp="$build_dir/.source-revision"
 
-	expected_version="${BROTLI_VERSION:-$(sed -n '1p' "$project_root/.brotli-version")}"
+	expected_version="${BROTLI_VERSION:-$("$project_root/scripts/read-version.sh" brotli)}"
 	ensure_submodule tools/brotli CMakeLists.txt
 	actual_version="$(get_brotli_version "$source_dir")"
 
@@ -182,7 +182,7 @@ ensure_terser() {
 	local expected_lock current_lock
 	local stamp="$install_dir/.package-lock.sha256"
 
-	expected_version="${TERSER_VERSION:-$(sed -n '1p' "$project_root/.terser-version")}"
+	expected_version="${TERSER_VERSION:-$("$project_root/scripts/read-version.sh" terser)}"
 	expected_lock="$(shasum -a 256 "$source_dir/package-lock.json" | awk '{ print $1 }')"
 	current_lock="$(sed -n '1p' "$stamp" 2> /dev/null || true)"
 

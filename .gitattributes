@@ -27,11 +27,6 @@
 *.yaml text eol=lf
 *.yml text eol=lf
 
-.brotli-version text eol=lf
-.cosign-version text eol=lf
-.emscripten-version text eol=lf
-.syft-version text eol=lf
-.terser-version text eol=lf
 .editorconfig text eol=lf
 .gitattributes text eol=lf
 .gitignore text eol=lf

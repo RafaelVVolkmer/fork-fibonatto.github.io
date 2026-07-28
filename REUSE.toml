@@ -5,11 +5,6 @@ version = 1
 
 [[annotations]]
 path = [
-  ".brotli-version",
-  ".cosign-version",
-  ".emscripten-version",
-  ".syft-version",
-  ".terser-version",
   "assets/**",
   "compile_commands.json",
   "content/posts/**",
