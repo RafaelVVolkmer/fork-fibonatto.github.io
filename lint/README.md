@@ -32,13 +32,13 @@ Install the pinned standalone executables locally with:
 ./lint/install-tools.sh
 ```
 
-They are written to `.cache/lint/bin`, which the root Makefile adds to its
-`PATH`. The script verifies the configured SHA-256 digest of every download.
+They are written to `.cache/lint/bin`, which the root Make entry point adds to
+its `PATH`. The script verifies the configured SHA-256 digest of every download.
 The current inventory targets Linux x86-64; other platforms should provide the
 same executable names through their package manager.
 
 `clang-tidy` consumes the generated `compile_commands.json`. Generate it from
-the preprocessing and compilation flags in the root Makefile with:
+the preprocessing and compilation flags in the Make fragments with:
 
 ```sh
 make compile-commands

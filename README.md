@@ -226,7 +226,9 @@ The root `scripts/` directory exposes six modules instead of one file per
 operation: `build.sh`, `toolchain.sh`, `release.sh`, `maintenance.sh`,
 `runner.sh`, and `lint.sh`. Each module accepts a subcommand—for example,
 `toolchain.sh ensure emsdk`, `release.sh validate`, or
-`maintenance.sh cache`. The Makefile remains the supported public interface.
+`maintenance.sh cache`. The root Makefile remains the supported public
+interface and loads the configuration, flags, targets, generated inputs, and
+pipeline rules from the ordered fragments under `mk/`.
 
 Every root Make invocation other than cleanup targets is recorded while its
 output is still streamed to the terminal. The requested goals form a profile
@@ -328,6 +330,7 @@ available to Emscripten's compiler, runtime settings, `wasm-ld`, and Binaryen.
 │       ├── src/            Packer sources
 │       └── Makefile        Standalone release/debug build
 ├── scripts/                Build, audit, packaging, and validation helpers
+├── mk/                     Ordered GNU Make configuration and build fragments
 ├── lint/                   Native lint runner, configs, and pinned CI tools
 ├── logs/                   Ignored per-profile Make invocation logs
 ├── .github/workflows/      GitHub Pages build and deployment
