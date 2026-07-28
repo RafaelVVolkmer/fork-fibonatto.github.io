@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # Intentional standalone allocation example retained byte-for-byte from upstream.
-memleak:core/src/heart.c:10
+memleak:core/src/heart.c:13
 
 # qsort receives zero elements when slug_order has not been initialized.
-uninitvar:tools/packer/src/packer.c:282
+uninitvar:tools/packer/src/packer.c:285

@@ -9,7 +9,7 @@ accept = [
 cache = false
 exclude = [
   "^mailto:",
-  "^https://fibonatto\\.github\\.io/",
+  "^https://rafaelvvolkmer\\.github\\.io/fork-fibonatto\\.github\\.io/$",
 ]
 exclude_path = [
   "^\\.build/",
