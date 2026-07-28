@@ -534,7 +534,7 @@ packer:
 build: _release
 
 _release: check-tools sbom
-	@./scripts/release.sh validate
+	@./scripts/release.sh validate-package
 	@echo "Release completed in $(DIST_DIR)/"
 
 audit: check-tools $(SOURCE_AUDIT_STAMP) $(AUDIT_STAMP)

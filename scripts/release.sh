@@ -331,9 +331,10 @@ finalize_metadata() {
 }
 
 # ------------------------------------------------------------------------------
-# Final distribution contract validation
+# Package and final distribution contract validation
 # ------------------------------------------------------------------------------
 validate_dist() {
+	local validation_scope="${1:-final}"
 	local dist_dir="$project_root/dist"
 	local cyclonedx_sbom="$dist_dir/.metadata/sbom.cyclonedx.json"
 	local spdx_sbom="$dist_dir/.metadata/sbom.spdx.json"
@@ -360,7 +361,8 @@ validate_dist() {
 	elif [[ -e "$cyclonedx_sbom" || -e "$spdx_sbom" ]]; then
 		required+=("$cyclonedx_sbom" "$spdx_sbom")
 	fi
-	if [[ "${REQUIRE_SIGNATURE:-0}" == "1" ]]; then
+	if [[ "$validation_scope" == "final" &&
+		"${REQUIRE_SIGNATURE:-0}" == "1" ]]; then
 		required+=("$release_manifest" "$cosign_status" "$cosign_bundle")
 	fi
 	for path in "${required[@]}"; do
@@ -393,7 +395,8 @@ validate_dist() {
 		grep -q '"files": \[' "$spdx_sbom"
 	fi
 
-	if [[ -e "$release_manifest" || -e "$cosign_status" ]]; then
+	if [[ "$validation_scope" == "final" ]] \
+		&& [[ -e "$release_manifest" || -e "$cosign_status" ]]; then
 		[[ -s "$release_manifest" && -s "$cosign_status" ]]
 		find "$dist_dir/.metadata/logs/build" -type f -name '*.log' \
 			-print -quit | grep -q .
@@ -443,11 +446,14 @@ case "$action" in
 	finalize)
 		finalize_metadata "$@"
 		;;
+	validate-package)
+		validate_dist package "$@"
+		;;
 	validate)
-		validate_dist "$@"
+		validate_dist final "$@"
 		;;
 	*)
-		echo "Usage: $0 {package|sbom|finalize RELEASE_LOG RELEASE_ID|validate}" >&2
+		echo "Usage: $0 {package|sbom|finalize RELEASE_LOG RELEASE_ID|validate-package|validate}" >&2
 		exit 2
 		;;
 esac
