@@ -44,10 +44,9 @@ the preprocessing and compilation flags in the Make fragments with:
 make compile-commands
 ```
 
-The `clang-format` configuration intentionally has `DisableFormat: true`.
-The check verifies that every C/H file and the pinned configuration can be
-parsed by `clang-format`; formatting enforcement can be enabled in the
-dedicated source-formatting change.
+The `clang-format` configuration enforces the project style across every C/H
+file under `core/`, `tests/`, and `tools/packer/`. The vendored Emscripten and
+Brotli submodules remain outside the project-owned formatting boundary.
 
 Repository documentation uses the configured Markdown rule set. Existing
 published posts retain their original typography and are checked against a

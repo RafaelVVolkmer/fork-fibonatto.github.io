@@ -2,11 +2,190 @@
 # SPDX-License-Identifier: MIT
 
 ---
-# Formatting remains intentionally disabled until the dedicated source-format
-# change. The check still verifies that every C/H input and this configuration
-# can be parsed by clang-format.
+# ==============================================================================
+# 1. Base style
+# ==============================================================================
 BasedOnStyle: LLVM
-DisableFormat: true
-SortIncludes: Never
+Language: Cpp
+Standard: Cpp11
+AccessModifierOffset: -4
+IndentWidth: 8
+TabWidth: 8
+UseTab: Always
+ColumnLimit: 80
+BreakBeforeBraces: Attach
+ReflowComments: true
+InsertNewlineAtEOF: true
+
+# ==============================================================================
+# 2. Brace wrapping
+#
+# These values document the complete brace policy. BreakBeforeBraces: Attach
+# is authoritative, so custom wrapping is intentionally inactive.
+# ==============================================================================
+BraceWrapping:
+  AfterFunction: true
+  AfterClass: true
+  AfterEnum: true
+  AfterControlStatement: true
+  BeforeCatch: true
+  BeforeElse: true
+
+# ==============================================================================
+# 3. Alignment rules
+# ==============================================================================
+AlignAfterOpenBracket: Align
+BracedInitializerIndentWidth: 2
+AlignArrayOfStructures: Right
+
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+  AlignCompound: true
+  PadOperators: true
+
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+
+AlignConsecutiveDeclarations:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: true
+
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+  AlignCaseColons: false
+
+AlignEscapedNewlines: Left
+AlignOperands: true
+ReferenceAlignment: Right
+
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 2
+
+# ==============================================================================
+# 4. Bin packing and wrapping
+# ==============================================================================
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowAllArgumentsOnNextLine: true
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLambdasOnASingleLine: true
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+BinPackArguments: false
+BinPackParameters: false
+BitFieldColonSpacing: Both
+
+BreakAdjacentStringLiterals: true
+BreakAfterAttributes: Never
+BreakArrays: true
+BreakBeforeBinaryOperators: All
+BreakBeforeInlineASMColon: Always
+AlwaysBreakTemplateDeclarations: true
+BreakBeforeTernaryOperators: true
+BreakInheritanceList: AfterComma
+BreakStringLiterals: true
+
+# ==============================================================================
+# 5. Pointer and qualifier style
+# ==============================================================================
+DerivePointerAlignment: false
+PointerAlignment: Right
+QualifierAlignment: Left
+SpaceAroundPointerQualifiers: Default
+
+# ==============================================================================
+# 6. Includes and miscellaneous rules
+# ==============================================================================
+SortIncludes: true
+IncludeBlocks: Regroup
+RemoveParentheses: Leave
+RemoveSemicolon: false
+JavaScriptQuotes: Single
+
+# ==============================================================================
+# 7. Indentation and directives
+# ==============================================================================
+IndentCaseBlocks: false
+IndentCaseLabels: true
+IndentExternBlock: false
+IndentGotoLabels: false
+IndentPPDirectives: BeforeHash
+IndentWrappedFunctionNames: false
+InsertBraces: false
+
+# ==============================================================================
+# 8. Parentheses and spacing
+# ==============================================================================
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterFunctionDefinitionName: false
+  AfterFunctionDeclarationName: false
+
+SpaceInEmptyBlock: true
+SpaceInEmptyParentheses: true
+SpacesInContainerLiterals: false
+SpacesInSquareBrackets: false
+SpaceBeforeSquareBrackets: false
+
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: true
+
+SpacesBeforeTrailingComments: 1
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: 1
+
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InConditionalStatements: false
+  InCStyleCasts: false
+  InEmptyParentheses: true
+  Other: false
+
+# ==============================================================================
+# 9. Numeric literals and line endings
+# ==============================================================================
+IntegerLiteralSeparator:
+  Binary: -1
+  Decimal: -1
+  Hex: -1
+
+LineEnding: LF
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+DisableFormat: false
+
+# ==============================================================================
+# 10. Formatting penalties
+# ==============================================================================
+PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyBreakComment: 1000
+PenaltyBreakOpenParenthesis: 1000
+PenaltyBreakBeforeFirstCallParameter: 1000
+PenaltyExcessCharacter: 1000
+PenaltyIndentedWhitespace: 0
+PenaltyBreakString: 0
 
 # EOF
