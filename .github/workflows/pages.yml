@@ -79,6 +79,9 @@ jobs:
           ./lint/install-tools.sh
           echo "${LINT_BIN_DIR}" >> "${GITHUB_PATH}"
 
+      - name: Verify source manifest
+        run: make audit-sources
+
       - name: Run the complete lint gate
         run: make lint USE_BUNDLED_EMSDK=1
 

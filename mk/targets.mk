@@ -44,7 +44,7 @@ all: release
 
 # A release is always produced from a clean tree of generated artifacts.
 ifeq ($(PACKER_REQUESTED),)
-release:
+release: audit-sources
 	@$(MAKE) --no-print-directory _clean
 	@if [[ "$(RUN_LINT)" == "1" ]]; then \
 		echo "[1/5] Lint"; \
@@ -95,7 +95,7 @@ audit-sources: $(SOURCE_AUDIT_STAMP)
 update-sources:
 	@./$(SOURCE_MANIFEST_TOOL) generate "$(SOURCE_MANIFEST)"
 
-validate: build
+validate: audit-sources build
 
 lint:
 	@$(MAKE) --no-print-directory compile-commands

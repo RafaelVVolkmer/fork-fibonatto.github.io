@@ -159,7 +159,9 @@ stops the release instead of being silently ignored.
 and `.h` file, including the packer. `make update-sources` regenerates the
 complete, deterministically sorted inventory. The audit compares the generated
 manifest byte-for-byte with the committed file, so added and removed sources
-are detected alongside content changes.
+are detected alongside content changes. `make validate`, `make release`, and
+the Pages CI workflow require this check; `make build` remains an unblocked
+development loop.
 
 Project-owned C compiles with the supported warning set promoted to errors.
 Diagnostics intrinsic to Emscripten's `EM_JS` macro expansion are suppressed
