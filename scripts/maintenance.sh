@@ -7,6 +7,8 @@
 # maintenance.sh — scoped cleanup operations for generated project state
 #
 # - Removes build and distribution artifacts without touching persistent caches.
+# - Removes frontend dependencies, reports, results, and transient npm files.
+# - Recursively removes Windows Zone.Identifier metadata outside Git internals.
 # - Removes tool caches, Make logs, or emsdk-managed downloads independently.
 # - Validates every destructive path against the absolute repository root.
 # - Selects one cleanup scope through the build, cache, logs, or sdk argument.
@@ -26,16 +28,36 @@ action="${1:-}"
 clean_build() {
 	local build_dir="$project_root/.build"
 	local dist_dir="$project_root/dist"
+	local frontend_dir="$project_root/tests/frontend"
 
 	[[ "$build_dir" == "$project_root/.build" ]]
 	[[ "$dist_dir" == "$project_root/dist" ]]
+	[[ "$frontend_dir" == "$project_root/tests/frontend" ]]
 	rm -rf "$build_dir" "$dist_dir"
+	rm -rf \
+		"$frontend_dir/.cache" \
+		"$frontend_dir/.playwright" \
+		"$frontend_dir/blob-report" \
+		"$frontend_dir/node_modules" \
+		"$frontend_dir/playwright-report" \
+		"$frontend_dir/test-results"
 	rm -f \
 		"$project_root/compile_commands.json" \
 		"$project_root/tags" \
 		"$project_root/.tags" \
 		"$project_root/.vscode-ctags"
 	find "$project_root" -maxdepth 1 -type f -name '*.plist' -delete
+	if [[ -d "$frontend_dir" ]]; then
+		find "$frontend_dir" -maxdepth 1 -type f \
+			-name 'npm-debug.log*' -delete
+	fi
+	find "$project_root" \
+		-type d -name .git -prune -o \
+		-type f \
+		\( -name 'Zone.Identifier' \
+		-o -name '*:Zone.Identifier' \
+		-o -name '*.Zone.Identifier' \) \
+		-exec rm -f -- {} +
 	echo "Build artifacts removed."
 }
 

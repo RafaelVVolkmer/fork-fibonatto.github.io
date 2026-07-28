@@ -222,11 +222,13 @@ target. Atomics and SIMD are also left disabled because enabling them would
 change the browser execution and compatibility contract rather than harden this
 application.
 `make clean` removes `.build/`, `dist/`, root-level compiler databases, tags,
-legacy compiler reports, and previous Make logs, while preserving reusable
-caches and locally built toolchains. `make logs-clean` removes only previous
-logs; `make cache-clean` removes `.cache/`; `make sdk-clean` removes only
-downloads and installed toolchains ignored inside the `tools/emsdk` submodule.
-`make distclean` and its `make dist-clean` alias perform all cleanups.
+legacy compiler reports, previous Make logs, and generated Playwright state.
+It also removes Windows `Zone.Identifier` metadata recursively while excluding
+Git internals. Reusable caches and locally built toolchains remain intact.
+`make logs-clean` removes only previous logs; `make cache-clean` removes
+`.cache/`; `make sdk-clean` removes only downloads and installed toolchains
+ignored inside the `tools/emsdk` submodule. `make distclean` and its
+`make dist-clean` alias perform all cleanups.
 
 The root `scripts/` directory exposes six modules instead of one file per
 operation: `build.sh`, `toolchain.sh`, `release.sh`, `maintenance.sh`,
@@ -420,7 +422,11 @@ It can always be removed safely with `make clean`.
 
 ```text
 .cache/
+├── container-audit/        Trivy and Grype databases
 ├── emscripten/             Emscripten compilation cache
+├── lint/                   Pinned standalone analysis executables
+├── playwright/             Local browser binaries
+├── syft/                   SBOM cataloger cache
 └── toolchains/             Repository-local Brotli and tool stamps
 ```
 

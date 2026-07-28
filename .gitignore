@@ -9,9 +9,13 @@
 /.reuse/
 /.rumdl_cache/
 /node_modules/
+/tests/frontend/.cache/
+/tests/frontend/.playwright/
+/tests/frontend/blob-report/
 /tests/frontend/node_modules/
 /tests/frontend/playwright-report/
 /tests/frontend/test-results/
+**/npm-debug.log*
 
 # Editor and language-server state
 /.cache/
@@ -28,5 +32,8 @@
 
 # OS-specific files
 .DS_Store
+**/Zone.Identifier
+**/*:Zone.Identifier
+**/*.Zone.Identifier
 
 # EOF
