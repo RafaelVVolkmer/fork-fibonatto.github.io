@@ -9,6 +9,9 @@
 /.reuse/
 /.rumdl_cache/
 /node_modules/
+/tests/frontend/node_modules/
+/tests/frontend/playwright-report/
+/tests/frontend/test-results/
 
 # Editor and language-server state
 /.cache/

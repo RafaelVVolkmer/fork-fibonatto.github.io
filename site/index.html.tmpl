@@ -137,6 +137,12 @@ SPDX-License-Identifier: MIT
             text-underline-offset: 0.16em;
         }
 
+        #header-nav a:focus-visible,
+        #header-nav button:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 4px;
+        }
+
         code, pre {
             font-family: 'Courier New', monospace !important;
             font-size: 0.95rem;

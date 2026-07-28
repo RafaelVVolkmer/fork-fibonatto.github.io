@@ -281,6 +281,17 @@ from the preprocessing and compilation flags defined by the Makefile. Every
 packaged build copies that exact database to
 `dist/.metadata/compile_commands.json`.
 
+The browser integration suite is isolated under `tests/frontend/`. It serves
+the final `dist/` directory and exercises the complete HTML, Emscripten,
+WebAssembly, C router, and DOM path with real mouse and keyboard interactions.
+Run it after generating a release:
+
+```sh
+npm ci --prefix tests/frontend
+npx --prefix tests/frontend playwright install chromium
+npm test --prefix tests/frontend
+```
+
 `make lint` first generates the compilation database required by Clang-Tidy,
 then delegates to `scripts/lint.sh`. The lint system uses host-native
 executables for ShellCheck, shell formatting, YAML, TOML, JSON, Markdown,
@@ -328,6 +339,10 @@ available to Emscripten's compiler, runtime settings, `wasm-ld`, and Binaryen.
 ├── site/
 │   ├── index.html.tmpl     HTML shell and asset placeholders
 │   └── static/             Files copied verbatim to dist/
+├── tests/
+│   ├── frontend/           Isolated Playwright browser integration suite
+│   ├── include/            Native test compatibility headers
+│   └── unit/               Sanitizer-backed C unit tests
 ├── tools/
 │   ├── brotli/             Official Google Brotli submodule
 │   ├── emsdk/              Pinned Emscripten SDK submodule
@@ -458,6 +473,12 @@ Pushes to `main` or `develop` upload `dist/` as the Pages artifact and deploy th
 artifact. The SBOMs are published at
 `/.metadata/sbom.cyclonedx.json` and `/.metadata/sbom.spdx.json`; the signed
 source inventory is published at `/.metadata/sources.sha256`.
+
+Before upload, Playwright runs the local end-to-end suite against that exact
+`dist/`. After deployment, `smoke-pages.mjs` validates the public URL, hashed
+assets, WebAssembly header, SBOMs, signature status, source inventory, and
+browser execution. This keeps UI regressions separate from publication and
+integrity failures while covering both boundaries.
 
 The canonical public origin is stored in `site/url.txt`. Because `dist/` is the
 Pages document root, `dist/sitemap.xml` is published as `/sitemap.xml`; the

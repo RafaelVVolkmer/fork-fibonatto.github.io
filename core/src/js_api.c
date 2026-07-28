@@ -375,8 +375,9 @@ EM_JS(void,
 	      const style = UTF8ToString(style_cstr);
 	      let header  = document.getElementById(id);
 	      if (!header) {
-		      header	= document.createElement("div");
+		      header	= document.createElement("nav");
 		      header.id = id;
+		      header.setAttribute("aria-label", "Primary navigation");
 		      document.body.appendChild(header);
 	      }
 	      header.style.cssText = style;
@@ -396,10 +397,12 @@ EM_JS(void,
 	      const header
 		  = document.getElementById(containerId) || document.body;
 
-	      const btn		= document.createElement("div");
+	      const btn		= document.createElement("button");
 	      btn.id		= id;
+	      btn.type		= "button";
 	      btn.textContent	= label;
 	      btn.style.cssText = style;
+	      btn.setAttribute("aria-label", "Toggle color theme");
 
 	      btn.onclick = ( ) => {
 		      if (Module._ui_toggle_theme) {
@@ -425,18 +428,21 @@ EM_JS(void,
 	      const header
 		  = document.getElementById(containerId) || document.body;
 
-	      const btn		= document.createElement("div");
-	      btn.id		= id;
-	      btn.textContent	= label;
-	      btn.style.cssText = style;
+	      const route	= is_blog !== 0 ? "#/blog" : "#/";
+	      const link		= document.createElement("a");
+	      link.id		= id;
+	      link.href		= route;
+	      link.textContent	= label;
+	      link.style.cssText = style;
 
-	      btn.onclick = ( ) => {
+	      link.onclick = (event) => {
+		      event.preventDefault( );
 		      if (Module._switch_page) {
 			      Module._switch_page(is_blog !== 0);
 		      }
 	      };
 
-	      header.appendChild(btn);
+	      header.appendChild(link);
       });
 
 EM_JS(void,

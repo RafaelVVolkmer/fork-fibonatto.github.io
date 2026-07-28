@@ -21,6 +21,8 @@ path = [
   "lint/json/versions.json",
   "site/static/.nojekyll",
   "site/static/google0d6f4c8219a52398.html",
+  "tests/frontend/package.json",
+  "tests/frontend/package-lock.json",
   "tools/packer/inc/**",
   "tools/packer/src/**",
 ]

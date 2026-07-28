@@ -178,6 +178,17 @@ jobs:
             USE_BUNDLED_EMSDK=1 \
             USE_BUNDLED_BROTLI=1
 
+      - name: Install frontend test dependencies
+        run: npm ci --prefix tests/frontend
+
+      - name: Install Chromium
+        run: >-
+          npx --prefix tests/frontend
+          playwright install --with-deps chromium
+
+      - name: Run frontend end-to-end tests
+        run: npm test --prefix tests/frontend
+
       - name: Scan repository dependencies and secrets
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
         with:

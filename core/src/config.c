@@ -44,10 +44,12 @@ const struct theme theme_light = {.bg	       = 3,
 				  .code_border = 4};
 
 const struct header_config header = {.title	      = "Bonatto",
+				     .home_label      = "home",
 				     .blog_label      = "blog",
 				     .light_label     = "light",
 				     .dark_label      = "dark",
 				     .container_id    = "header-nav",
+				     .home_id	      = "nav-home",
 				     .blog_id	      = "nav-blog",
 				     .theme_id	      = "theme-toggle",
 				     .container_style = "position:fixed;top:0;"
@@ -63,10 +65,15 @@ const struct header_config header = {.title	      = "Bonatto",
 							"align-items:center;"
 							"box-"
 							"sizing:border-box;",
-				     .item_style = "font-size:20px;user-select:"
-						   "none;cursor:pointer;"
-						   "color:var(--text-color);"
-						   "text-decoration:none;",
+				     .item_style  = "font-family:inherit;font-"
+						    "size:"
+						    "20px;background:"
+						    "transparent;"
+						    "border:0;padding:0;user-"
+						    "select:"
+						    "none;cursor:pointer;"
+						    "color:var(--text-color);"
+						    "text-decoration:none;",
 				     .title_style = "font-size:18px;font-"
 						    "weight:bold;user-select:"
 						    "none;cursor:pointer;"
