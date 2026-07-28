@@ -7,20 +7,21 @@
 #include <string.h>
 
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
-#pragma clang diagnostic ignored "-Wextra-semi"
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
+	#pragma clang diagnostic ignored "-Wextra-semi"
+	#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
 // From sys.c
 EM_JS(int, sys_load_theme, (void), {
 	const val = localStorage.getItem('site-theme');
-	return (val === 'dark') ? 1 : 0;
+	return (val == = 'dark') ? 1 : 0;
 });
 
-EM_JS(void, sys_save_theme, (int is_dark),
-      { localStorage.setItem('site-theme', is_dark ? 'dark' : 'light'); });
+EM_JS(void, sys_save_theme, (int is_dark), {
+	localStorage.setItem('site-theme', is_dark ? 'dark' : 'light');
+});
 
 EM_JS(void, sys_set_html, (const char *sel_ptr, const char *html_ptr), {
 	const sel  = UTF8ToString(sel_ptr);
@@ -29,15 +30,15 @@ EM_JS(void, sys_set_html, (const char *sel_ptr, const char *html_ptr), {
 	if (!el)
 		return;
 
-	const range = document.createRange();
+	const range = document.createRange( );
 	range.selectNodeContents(el);
 	const fragment = range.createContextualFragment(html);
 	el.replaceChildren(fragment);
 
-	if (sel === '#feed') {
-		el.querySelectorAll('.img-placeholder').forEach(ph => {
+	if (sel == = '#feed') {
+		el.querySelectorAll('.img-placeholder').forEach(ph = > {
 			const src = ph.dataset.src;
-			const img = new Image();
+			const img = new Image( );
 			img.src	  = src;
 			img.alt	  = ph.dataset.alt || "";
 			if (ph.dataset.lcp) {
@@ -57,12 +58,12 @@ EM_JS(void, sys_set_html, (const char *sel_ptr, const char *html_ptr), {
 			if (ph.dataset.scale) {
 				const scale	= parseFloat(ph.dataset.scale);
 				img.style.width = "auto";
-				img.onload = () => {
-					img.style.width =
-					    (img.naturalWidth * scale) + "px";
+				img.onload = ( ) = > {
+					img.style.width
+					    = (img.naturalWidth * scale) + "px";
 				};
 				if (img.complete)
-					img.onload();
+					img.onload( );
 			} else {
 				img.style.width = "";
 			}
@@ -84,7 +85,7 @@ EM_JS(void, sys_set_style, (const char *sel_ptr, const char *css_ptr), {
 	const sel = UTF8ToString(sel_ptr);
 	const css = UTF8ToString(css_ptr);
 	const els = document.querySelectorAll(sel);
-	els.forEach(el => el.style.cssText = css);
+	els.forEach(el = > el.style.cssText = css);
 });
 
 EM_JS(void, sys_scroll_to_bottom, (const char *sel_ptr), {
@@ -96,16 +97,16 @@ EM_JS(void, sys_scroll_to_bottom, (const char *sel_ptr), {
 
 EM_JS(void, sys_init_router, (void), {
 	window.addEventListener(
-	    'popstate', () => {
+	    'popstate', ( ) = > {
 		    if (Module._handle_current_route) {
-			    Module._handle_current_route();
+			    Module._handle_current_route( );
 		    }
 	    });
 
 	window.addEventListener(
-	    'hashchange', () => {
+	    'hashchange', ( ) = > {
 		    if (Module._handle_current_route) {
-			    Module._handle_current_route();
+			    Module._handle_current_route( );
 		    }
 	    });
 });
@@ -122,17 +123,20 @@ EM_JS(void, sys_get_url_hash, (char *buf, size_t max_len), {
 	stringToUTF8(hash, buf, max_len);
 });
 
-EM_JS(void, sys_set_meta,
-      (const char *t_ptr, const char *d_ptr, const char *u_ptr), {
+EM_JS(void,
+      sys_set_meta,
+      (const char *t_ptr, const char *d_ptr, const char *u_ptr),
+      {
 	      const title = UTF8ToString(t_ptr);
 	      const desc  = UTF8ToString(d_ptr);
 	      const url	  = UTF8ToString(u_ptr);
 
 	      document.title = title;
 
-	      const setMeta = (attr, name, content) => {
-		      let el =
-			  document.querySelector(`meta[${attr} = "${name}"]`);
+	      const setMeta = (attr, name, content) = > {
+		      let el = document.querySelector(`meta[${attr} = "${"
+								      "name"
+								      "}"]`);
 		      if (!el) {
 			      el = document.createElement('meta');
 			      el.setAttribute(attr, name);
@@ -143,8 +147,7 @@ EM_JS(void, sys_set_meta,
 
 	      const siteRoot = new URL('.', document.baseURI);
 	      const fullUrl  = new URL(url, siteRoot).href;
-	      const imgUrl =
-		  new URL('assets/images/seo.png', siteRoot).href;
+	      const imgUrl   = new URL('assets/images/seo.png', siteRoot).href;
 
 	      setMeta('name', 'description', desc);
 	      setMeta('property', 'og:title', title);
@@ -159,10 +162,10 @@ EM_JS(void, sys_set_meta,
 EM_JS(void, sys_render_footer, (const char *style_ptr, const char *url_ptr), {
 	const style = UTF8ToString(style_ptr);
 	const url   = UTF8ToString(url_ptr);
-	const year  = new Date().getFullYear();
+	const year  = new Date( ).getFullYear( );
 
-	let footer =
-	    document.querySelector('body > footer[data-site-footer="1"]');
+	let footer
+	    = document.querySelector('body > footer[data-site-footer="1"]');
 	if (!footer) {
 		footer			  = document.createElement('footer');
 		footer.dataset.siteFooter = '1';
@@ -175,13 +178,13 @@ EM_JS(void, sys_render_footer, (const char *style_ptr, const char *url_ptr), {
 	outer.style.cssText = 'max-width:900px;margin:0 auto;padding:0 20px;';
 
 	const row = document.createElement('div');
-	row.style.cssText =
-	    'display:flex;justify-content:space-between;align-items:center;'
-	    + 'gap:16px;flex-wrap:wrap;';
+	row.style.cssText
+	    = 'display:flex;justify-content:space-between;align-items:center;'
+	      + 'gap:16px;flex-wrap:wrap;';
 
 	const meta = document.createElement('div');
-	meta.style.cssText =
-	    'font-size:14px;display:flex;align-items:center;gap:8px;';
+	meta.style.cssText
+	    = 'font-size:14px;display:flex;align-items:center;gap:8px;';
 
 	const copyright	      = document.createElement('span');
 	copyright.textContent = '\u00A9 ' + String(year) + ' [Bonatto]';
@@ -210,20 +213,23 @@ EM_JS(void, sys_render_footer, (const char *style_ptr, const char *url_ptr), {
 	footer.replaceChildren(outer);
 });
 
-EM_JS(void, sys_console_log, (const char *msg_ptr),
-      { console.log(UTF8ToString(msg_ptr)); });
+EM_JS(void, sys_console_log, (const char *msg_ptr), {
+	console.log(UTF8ToString(msg_ptr));
+});
 
-EM_JS(double, sys_now, (void), { return performance.now(); });
+EM_JS(double, sys_now, (void), { return performance.now( ); });
 
 // From render.c
-EM_JS(void, update_theme_colors,
-      (const struct theme *t, const char *const *palette), {
+EM_JS(void,
+      update_theme_colors,
+      (const struct theme *t, const char *const *palette),
+      {
 	      if (!Module.gfx)
 		      return;
 
 	      const rootStyle  = document.documentElement.style;
-	      const getPalette = (idx) =>
-		  UTF8ToString(HEAP32[(palette >> 2) + idx]);
+	      const getPalette = (idx) =
+		  > UTF8ToString(HEAP32[(palette >> 2) + idx]);
 
 	      /* t layout: bg(0), text(4), dim(8), accent(12), code_bg(16),
 	       * code_border(20) */
@@ -252,7 +258,7 @@ EM_JS(void, update_theme_colors,
 	      Module.gfx.bg	   = bg;
 	      Module.gfx.textColor = text;
 
-	      if (bg_idx === 0) {
+	      if (bg_idx == = 0) {
 		      document.documentElement.classList.add('dark-theme');
 		      localStorage.setItem('site-theme', 'dark');
 	      } else {
@@ -268,18 +274,18 @@ EM_JS(void, init_graphics, (const struct theme *t, int header_h), {
 
 	Module.gfx = {
 		cvs,
-		ctx : cvs.getContext("2d", {alpha : true}),
+		ctx: cvs.getContext("2d", {alpha: true}),
 		header_h,
-		bg : "",
-		label : "",
-		textColor : ""
+		bg: "",
+		label: "",
+		textColor: ""
 	};
 
-	const onResize = () => {
+	const onResize = ( ) = > {
 		const dpr   = window.devicePixelRatio || 1;
 		const width = Math.max(1, Math.floor(window.innerWidth * dpr));
-		const height =
-		    Math.max(1, Math.floor(window.innerHeight * dpr));
+		const height
+		    = Math.max(1, Math.floor(window.innerHeight * dpr));
 
 		cvs.width	 = width;
 		cvs.height	 = height;
@@ -287,52 +293,58 @@ EM_JS(void, init_graphics, (const struct theme *t, int header_h), {
 		cvs.style.height = window.innerHeight + 'px';
 		Module.gfx.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 		if (Module._draw_frame)
-			Module._draw_frame();
+			Module._draw_frame( );
 	};
 
 	window.addEventListener('resize', onResize);
-	onResize();
+	onResize( );
 
 	// Ensure font is loaded then redraw
 	if (document.fonts) {
-		document.fonts.load("700 60px 'Latin Modern Roman'").then(() => {
-			if (Module._draw_frame)
-				Module._draw_frame();
-		});
+		document.fonts.load("700 60px 'Latin Modern Roman'")
+		    .then(( ) = > {
+			    if (Module._draw_frame)
+				    Module._draw_frame( );
+		    });
 	}
 });
 
-EM_JS(void, render_update_strings,
-      (const char *label_ptr, int text_color_idx, const char *const *palette), {
+EM_JS(void,
+      render_update_strings,
+      (const char *label_ptr, int text_color_idx, const char *const *palette),
+      {
 	      if (!Module.gfx)
 		      return;
-	      const getPalette = (idx) =>
-		  UTF8ToString(HEAP32[(palette >> 2) + idx]);
+	      const getPalette = (idx) =
+		  > UTF8ToString(HEAP32[(palette >> 2) + idx]);
 
 	      Module.gfx.label	   = UTF8ToString(label_ptr);
 	      Module.gfx.textColor = getPalette(text_color_idx);
 
 	      if (Module._draw_frame)
-		      Module._draw_frame();
+		      Module._draw_frame( );
       });
 
-EM_JS(void, add_header_title,
-      (const char *text, const char *style, const char *parent_id), {
-          const parent = document.getElementById(UTF8ToString(parent_id));
-          if (!parent) return;
+EM_JS(void,
+      add_header_title,
+      (const char *text, const char *style, const char *parent_id),
+      {
+	      const parent = document.getElementById(UTF8ToString(parent_id));
+	      if (!parent)
+		      return;
 
-          const span = document.createElement('span');
-          span.innerText = UTF8ToString(text);
-          span.setAttribute('style', UTF8ToString(style));
-          
-          parent.insertBefore(span, parent.firstChild);
+	      const span     = document.createElement('span');
+	      span.innerText = UTF8ToString(text);
+	      span.setAttribute('style', UTF8ToString(style));
+
+	      parent.insertBefore(span, parent.firstChild);
       });
 
 EM_JS(void, apply_style, (const char *selector_cstr, const char *style_cstr), {
 	const selector = UTF8ToString(selector_cstr);
 	const style    = UTF8ToString(style_cstr);
 	const elements = document.querySelectorAll(selector);
-	elements.forEach(el => el.style.cssText = style);
+	elements.forEach(el = > el.style.cssText = style);
 });
 
 EM_JS(void, draw_frame, (void), {
@@ -353,73 +365,89 @@ EM_JS(void, draw_frame, (void), {
 });
 
 // From ui.c
-EM_JS(void, add_header_container, (const char *id_cstr, const char *style_cstr), {
-	const id    = UTF8ToString(id_cstr);
-	const style = UTF8ToString(style_cstr);
-	let header = document.getElementById(id);
-	if (!header) {
-		header	  = document.createElement("div");
-		header.id = id;
-		document.body.appendChild(header);
-	}
-	header.style.cssText = style;
-});
-
-EM_JS(void, add_theme_toggle,
-      (const char *label_cstr, const char *style_cstr, const char *id_cstr,
-       const char *container_id_cstr), {
-	      const label = UTF8ToString(label_cstr);
-	      const style = UTF8ToString(style_cstr);
+EM_JS(void,
+      add_header_container,
+      (const char *id_cstr, const char *style_cstr),
+      {
 	      const id	  = UTF8ToString(id_cstr);
+	      const style = UTF8ToString(style_cstr);
+	      let header  = document.getElementById(id);
+	      if (!header) {
+		      header	= document.createElement("div");
+		      header.id = id;
+		      document.body.appendChild(header);
+	      }
+	      header.style.cssText = style;
+      });
+
+EM_JS(void,
+      add_theme_toggle,
+      (const char *label_cstr,
+       const char *style_cstr,
+       const char *id_cstr,
+       const char *container_id_cstr),
+      {
+	      const label	= UTF8ToString(label_cstr);
+	      const style	= UTF8ToString(style_cstr);
+	      const id		= UTF8ToString(id_cstr);
 	      const containerId = UTF8ToString(container_id_cstr);
-	      const header = document.getElementById(containerId) || document.body;
+	      const header
+		  = document.getElementById(containerId) || document.body;
 
 	      const btn		= document.createElement("div");
 	      btn.id		= id;
 	      btn.textContent	= label;
 	      btn.style.cssText = style;
 
-	      btn.onclick = () => {
+	      btn.onclick = ( ) = > {
 		      if (Module._ui_toggle_theme) {
-			      Module._ui_toggle_theme();
+			      Module._ui_toggle_theme( );
 		      }
 	      };
 
 	      header.appendChild(btn);
       });
 
-EM_JS(void, add_nav_link,
-      (const char *label_cstr, const char *style_cstr, const char *id_cstr,
-       const char *container_id_cstr, int is_blog), {
-	      const label = UTF8ToString(label_cstr);
-	      const style = UTF8ToString(style_cstr);
-	      const id	  = UTF8ToString(id_cstr);
+EM_JS(void,
+      add_nav_link,
+      (const char *label_cstr,
+       const char *style_cstr,
+       const char *id_cstr,
+       const char *container_id_cstr,
+       int is_blog),
+      {
+	      const label	= UTF8ToString(label_cstr);
+	      const style	= UTF8ToString(style_cstr);
+	      const id		= UTF8ToString(id_cstr);
 	      const containerId = UTF8ToString(container_id_cstr);
-	      const header = document.getElementById(containerId) || document.body;
+	      const header
+		  = document.getElementById(containerId) || document.body;
 
 	      const btn		= document.createElement("div");
 	      btn.id		= id;
 	      btn.textContent	= label;
 	      btn.style.cssText = style;
 
-	      btn.onclick = () => {
+	      btn.onclick = ( ) = > {
 		      if (Module._switch_page) {
-			      Module._switch_page(is_blog !== 0);
+			      Module._switch_page(is_blog != = 0);
 		      }
 	      };
 
 	      header.appendChild(btn);
       });
 
-EM_JS(void, update_theme_toggle_label,
-      (const char *id_cstr, const char *label_cstr), {
-	const id    = UTF8ToString(id_cstr);
-	const label = UTF8ToString(label_cstr);
-	const btn   = document.getElementById(id);
-	if (btn)
-		btn.textContent = label;
-});
+EM_JS(void,
+      update_theme_toggle_label,
+      (const char *id_cstr, const char *label_cstr),
+      {
+	      const id	  = UTF8ToString(id_cstr);
+	      const label = UTF8ToString(label_cstr);
+	      const btn	  = document.getElementById(id);
+	      if (btn)
+		      btn.textContent = label;
+      });
 
 #if defined(__clang__)
-#pragma clang diagnostic pop
+	#pragma clang diagnostic pop
 #endif

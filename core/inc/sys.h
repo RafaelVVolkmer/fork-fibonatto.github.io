@@ -4,10 +4,10 @@
 #ifndef PROJECT_SRC_SYS_H
 #define PROJECT_SRC_SYS_H
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
-/* 
+/*
  * SYSTEM INTERFACE (Platform Abstraction Layer)
  */
 

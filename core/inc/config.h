@@ -76,7 +76,6 @@ struct bar_segment {
 	enum bar_seg_style style;
 };
 
-
 extern const struct blog_post posts[];
 extern const int posts_count;
 int find_post_index_by_slug(const char *slug);

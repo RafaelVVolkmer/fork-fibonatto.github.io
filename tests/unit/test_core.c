@@ -1,24 +1,23 @@
 // SPDX-FileCopyrightText: 2026 Sergio Bonatto
 // SPDX-License-Identifier: MIT
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "buffer.h"
 #include "config.h"
 #include "markdown.h"
 #include "math.h"
 #include "ui.h"
 
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+
 static int graph_calls;
 static int image_calls;
 static int code_calls;
 
-static void assert_contains(const char *haystack, const char *needle)
-{
+static void assert_contains(const char *haystack, const char *needle) {
 	if (strstr(haystack, needle) == NULL) {
 		fprintf(stderr, "Expected output to contain: %s\n", needle);
 		fprintf(stderr, "Actual output: %s\n", haystack);
@@ -26,8 +25,7 @@ static void assert_contains(const char *haystack, const char *needle)
 	}
 }
 
-void add_code_block(struct str_view lang, struct str_view code)
-{
+void add_code_block(struct str_view lang, struct str_view code) {
 	code_calls++;
 	buf_append(&g_html_buf, "<pre data-lang=\"");
 	buf_append_attr_escaped(&g_html_buf, lang.data, lang.len);
@@ -36,13 +34,18 @@ void add_code_block(struct str_view lang, struct str_view code)
 	buf_append(&g_html_buf, "</code></pre>");
 }
 
-void add_image(const char *path, size_t path_len, const char *alt,
-	       size_t alt_len, float scale, int width, int height, int is_lcp)
-{
-	(void)scale;
-	(void)width;
-	(void)height;
-	(void)is_lcp;
+void add_image(const char *path,
+	       size_t path_len,
+	       const char *alt,
+	       size_t alt_len,
+	       float scale,
+	       int width,
+	       int height,
+	       int is_lcp) {
+	(void) scale;
+	(void) width;
+	(void) height;
+	(void) is_lcp;
 	image_calls++;
 	buf_append(&g_html_buf, "<img src=\"");
 	buf_append_attr_escaped(&g_html_buf, path, path_len);
@@ -53,26 +56,28 @@ void add_image(const char *path, size_t path_len, const char *alt,
 	buf_append(&g_html_buf, "\">");
 }
 
-void add_bar(int height, int width, const float *pcts, const char **colors,
-	     const float *opacities, const int *styles, int count)
-{
-	(void)height;
-	(void)width;
-	(void)pcts;
-	(void)colors;
-	(void)opacities;
-	(void)styles;
+void add_bar(int height,
+	     int width,
+	     const float *pcts,
+	     const char **colors,
+	     const float *opacities,
+	     const int *styles,
+	     int count) {
+	(void) height;
+	(void) width;
+	(void) pcts;
+	(void) colors;
+	(void) opacities;
+	(void) styles;
 	graph_calls += count > 0 ? 1 : 0;
 	buf_append(&g_html_buf, "<div data-test=\"graph\"></div>");
 }
 
-const char *get_article_body(int index)
-{
+const char *get_article_body(int index) {
 	return index == 0 ? "# Article\nBody" : NULL;
 }
 
-static void test_buffer(void)
-{
+static void test_buffer(void) {
 	Buffer buffer;
 	char fill[BUFFER_CAPACITY];
 
@@ -97,42 +102,43 @@ static void test_buffer(void)
 	assert(buffer.data[0] == '\0');
 }
 
-static void test_math(void)
-{
+static void test_math(void) {
 	Buffer buffer;
 
 	buf_reset(&buffer);
-	math_to_mathml(&buffer, "x^2 + \\frac{1}{y}",
-		       strlen("x^2 + \\frac{1}{y}"), false);
+	math_to_mathml(&buffer,
+		       "x^2 + \\frac{1}{y}",
+		       strlen("x^2 + \\frac{1}{y}"),
+		       false);
 	assert_contains(buffer.data, "<math ");
 	assert_contains(buffer.data, "<msup>");
 	assert_contains(buffer.data, "<mfrac>");
 	assert_contains(buffer.data, "</math>");
 
 	buf_reset(&buffer);
-	math_to_mathml(&buffer, "\\text{safe<&}", strlen("\\text{safe<&}"),
+	math_to_mathml(&buffer,
+		       "\\text{safe<&}",
+		       strlen("\\text{safe<&}"),
 		       true);
 	assert_contains(buffer.data, "display=\"block\"");
 	assert_contains(buffer.data, "&lt;");
 }
 
-static void test_markdown(void)
-{
-	const char *document =
-		"---\n"
-		"title: ignored\n"
-		"---\n"
-		"# Heading\n"
-		"Text <unsafe> and $x_1^2$.\n"
-		"![alt<](assets/image.png)\n"
-		"[[graph:100,20;0.5,--accent,1.0,s]]\n"
-		"```c\n"
-		"int value = 1 < 2;\n"
-		"```\n";
+static void test_markdown(void) {
+	const char *document = "---\n"
+			       "title: ignored\n"
+			       "---\n"
+			       "# Heading\n"
+			       "Text <unsafe> and $x_1^2$.\n"
+			       "![alt<](assets/image.png)\n"
+			       "[[graph:100,20;0.5,--accent,1.0,s]]\n"
+			       "```c\n"
+			       "int value = 1 < 2;\n"
+			       "```\n";
 
 	graph_calls = 0;
 	image_calls = 0;
-	code_calls = 0;
+	code_calls  = 0;
 	buf_reset(&g_html_buf);
 	render_markdown(document);
 
@@ -156,11 +162,10 @@ static void test_markdown(void)
 	assert_contains(g_html_buf.data, "<h1 class=\"para\">Article</h1>");
 }
 
-int main(void)
-{
-	test_buffer();
-	test_math();
-	test_markdown();
+int main(void) {
+	test_buffer( );
+	test_math( );
+	test_markdown( );
 	puts("Sanitizer unit tests passed.");
 	return 0;
 }

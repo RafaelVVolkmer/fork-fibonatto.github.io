@@ -4,16 +4,13 @@
 #include <stdlib.h>
 
 struct love {
-    int beats;
+	int beats;
 };
 
 int main(void) {
-    struct love *heart = malloc(sizeof *heart);
+	struct love *heart = malloc(sizeof *heart);
 
-    heart = NULL; /* brapao */
+	heart = NULL; /* brapao */
 
-    return 0;
+	return 0;
 }
-
-
-

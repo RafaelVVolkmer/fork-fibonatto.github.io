@@ -4,8 +4,9 @@
 #ifndef PROJECT_SRC_UI_H
 #define PROJECT_SRC_UI_H
 
-#include <stddef.h>
 #include "config.h"
+
+#include <stddef.h>
 /*
  * add_paragraph - Appends a text paragraph to the feed element.
  * @text_ptr: pointer to the string in WASM memory
@@ -18,7 +19,7 @@ void add_paragraph(const char *text_ptr, size_t len);
  * @lang: language identifier view
  * @code: source code content view
  */
-void add_code_block(struct str_view lang, struct str_view code); 
+void add_code_block(struct str_view lang, struct str_view code);
 /*
  * add_image - Appends an image to the feed element.
  * @path_ptr: pointer to the image path
@@ -30,17 +31,29 @@ void add_code_block(struct str_view lang, struct str_view code);
  * @height: explicit height for the image (0 for auto)
  * @is_lcp: whether the image is the largest contentful paint
  */
-void add_image(const char *path_ptr, size_t path_len,
-	       const char *alt_ptr, size_t alt_len, float scale,
-	       int width, int height, int is_lcp);
+void add_image(const char *path_ptr,
+	       size_t path_len,
+	       const char *alt_ptr,
+	       size_t alt_len,
+	       float scale,
+	       int width,
+	       int height,
+	       int is_lcp);
 
 void add_header_container(const char *id, const char *style);
-void add_header_title(const char *text, const char *style, const char *parent_id);
-void add_theme_toggle(const char *label, const char *style, const char *id,
+void add_header_title(const char *text,
+		      const char *style,
+		      const char *parent_id);
+void add_theme_toggle(const char *label,
+		      const char *style,
+		      const char *id,
 		      const char *container_id);
 void add_nav_group(const char *id, const char *container_id, const char *style);
-void add_nav_link(const char *label, const char *style, const char *id,
-		  const char *container_id, int is_blog);
+void add_nav_link(const char *label,
+		  const char *style,
+		  const char *id,
+		  const char *container_id,
+		  int is_blog);
 void ui_render_header(void);
 
 /*
@@ -109,8 +122,13 @@ void ui_get_current_hash(char *buf, size_t max_len);
  * @styles: array of bar_seg_style enums
  * @n: number of segments
  */
-void add_bar(int height, int width, const float *pcts, const char **colors,
-	     const float *opacities, const int *styles, int n);
+void add_bar(int height,
+	     int width,
+	     const float *pcts,
+	     const char **colors,
+	     const float *opacities,
+	     const int *styles,
+	     int n);
 
 /*
  * update_seo_metadata - Updates the document title and meta tags for SEO.
@@ -118,6 +136,8 @@ void add_bar(int height, int width, const float *pcts, const char **colors,
  * @description: new page description
  * @url: canonical URL or current path
  */
-void update_seo_metadata(const char *title, const char *description, const char *url);
+void update_seo_metadata(const char *title,
+			 const char *description,
+			 const char *url);
 
 #endif

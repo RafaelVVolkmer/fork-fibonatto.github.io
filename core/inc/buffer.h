@@ -4,23 +4,23 @@
 #ifndef PROJECT_SRC_BUFFER_H
 #define PROJECT_SRC_BUFFER_H
 
-#include <stddef.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #define BUFFER_CAPACITY (128 * 1024)
 
 #if defined(__clang__) || defined(__GNUC__)
-#define EHS_PRINTF_FORMAT(format_index, first_argument) \
-    __attribute__((format(printf, format_index, first_argument)))
+	#define EHS_PRINTF_FORMAT(format_index, first_argument) \
+		__attribute__((format(printf, format_index, first_argument)))
 #else
-#define EHS_PRINTF_FORMAT(format_index, first_argument)
+	#define EHS_PRINTF_FORMAT(format_index, first_argument)
 #endif
 
 typedef struct {
-    char data[BUFFER_CAPACITY];
-    size_t len;
-    bool overflow;
+	char data[BUFFER_CAPACITY];
+	size_t len;
+	bool overflow;
 } Buffer;
 
 extern Buffer g_html_buf;

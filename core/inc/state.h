@@ -4,8 +4,9 @@
 #ifndef PROJECT_SRC_STATE_H
 #define PROJECT_SRC_STATE_H
 
-#include <stdbool.h>
 #include "config.h"
+
+#include <stdbool.h>
 
 enum page_state {
 	PAGE_INITIAL,

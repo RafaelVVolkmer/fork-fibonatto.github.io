@@ -1,19 +1,21 @@
 // SPDX-FileCopyrightText: 2026 Sergio Bonatto
 // SPDX-License-Identifier: MIT
 
-#include <emscripten.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include "ui.h"
+#include "markdown.h"
+
+#include "buffer.h"
 #include "config.h"
 #include "contents_data.h"
-#include "markdown.h"
 #include "math.h"
-#include "buffer.h"
+#include "ui.h"
+
+#include <emscripten.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 static size_t span_length(const char *begin, const char *end) {
-	return end >= begin ? (size_t)(end - begin) : 0U;
+	return end >= begin ? (size_t) (end - begin) : 0U;
 }
 
 static bool is_digit_ascii(char c) {
@@ -39,7 +41,7 @@ static float fast_atof(const char **s, const char *end) {
 		(*s)++;
 		float frac = 0.1f;
 		while (*s < end && is_digit_ascii(**s)) {
-			res += (**s - '0') * frac;
+			res  += (**s - '0') * frac;
 			frac /= 10.0f;
 			(*s)++;
 		}
@@ -48,7 +50,7 @@ static float fast_atof(const char **s, const char *end) {
 }
 
 static const char *find_inline_math_end(const char *p, const char *end) {
-	return memchr(p, '$', (size_t)(end - p));
+	return memchr(p, '$', (size_t) (end - p));
 }
 
 static const char *find_display_math_end(const char *p, const char *end) {
@@ -64,11 +66,10 @@ static bool is_valid_graph_color_name(const char *name) {
 	if (!name || name[0] != '-' || name[1] != '-')
 		return false;
 
-	for (const unsigned char *p = (const unsigned char *)name + 2; *p; p++) {
-		if ((*p >= 'a' && *p <= 'z') ||
-		    (*p >= 'A' && *p <= 'Z') ||
-		    (*p >= '0' && *p <= '9') ||
-		    *p == '-' || *p == '_') {
+	for (const unsigned char *p = (const unsigned char *) name + 2; *p;
+	     p++) {
+		if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
+		    || (*p >= '0' && *p <= '9') || *p == '-' || *p == '_') {
 			continue;
 		}
 		return false;
@@ -102,55 +103,73 @@ static void render_graph_shortcode(const char *p, size_t len) {
 	const char *end = p + len;
 
 	h = fast_atoi(&p, end);
-	if (p < end && *p == ',') p++;
+	if (p < end && *p == ',')
+		p++;
 	w = fast_atoi(&p, end);
 	if (h <= 0 || w <= 0 || h > 4096 || w > 4096)
 		return;
 
 	while (p < end && n < 16) {
-		while (p < end && (*p == ';' || *p == ' ')) p++;
-		if (p >= end) break;
+		while (p < end && (*p == ';' || *p == ' '))
+			p++;
+		if (p >= end)
+			break;
 
 		pcts[n] = fast_atof(&p, end);
-		if (p < end && *p == ',') p++;
+		if (p < end && *p == ',')
+			p++;
 
 		colors[n] = cn_ptr;
-		while (p < end && *p != ',' && cn_ptr < cn_end) *cn_ptr++ = *p++;
+		while (p < end && *p != ',' && cn_ptr < cn_end)
+			*cn_ptr++ = *p++;
 		if (p < end && *p != ',')
 			return;
 		*cn_ptr++ = '\0';
 		if (!is_valid_graph_color_name(colors[n]))
 			return;
 
-		if (p < end && *p == ',') p++;
+		if (p < end && *p == ',')
+			p++;
 		opacs[n] = fast_atof(&p, end);
-		if (pcts[n] < 0.0f || pcts[n] > 1.0f || opacs[n] < 0.0f || opacs[n] > 1.0f)
+		if (pcts[n] < 0.0f || pcts[n] > 1.0f || opacs[n] < 0.0f
+		    || opacs[n] > 1.0f)
 			return;
-		if (p < end && *p == ',') p++;
+		if (p < end && *p == ',')
+			p++;
 
 		if (p < end) {
 			switch (*p) {
-			case 's': styles[n] = BAR_SEG_SOLID;   break;
-			case 'h': styles[n] = BAR_SEG_HATCHED; break;
-			default:  styles[n] = BAR_SEG_EMPTY;   break;
+				case 's' :
+					styles[n] = BAR_SEG_SOLID;
+					break;
+				case 'h' :
+					styles[n] = BAR_SEG_HATCHED;
+					break;
+				default :
+					styles[n] = BAR_SEG_EMPTY;
+					break;
 			}
-			while (p < end && *p != ';') p++;
+			while (p < end && *p != ';')
+				p++;
 		}
 		n++;
 	}
 
-	if (n > 0) add_bar(h, w, pcts, colors, opacs, styles, n);
+	if (n > 0)
+		add_bar(h, w, pcts, colors, opacs, styles, n);
 }
 
 void render_text(const char *text, size_t len) {
-	const char *p = text;
-	const char *end = text + len;
+	const char *p	  = text;
+	const char *end	  = text + len;
 	const char *start = p;
 
 	while (p < end) {
 		if (*p == '$') {
 			if (p > start) {
-				buf_escape(&g_html_buf, start, span_length(start, p));
+				buf_escape(&g_html_buf,
+					   start,
+					   span_length(start, p));
 			}
 
 			bool display = false;
@@ -161,19 +180,25 @@ void render_text(const char *text, size_t len) {
 			}
 
 			const char *math_start = p;
-			const char *math_end = NULL;
+			const char *math_end   = NULL;
 			if (display) {
 				math_end = find_display_math_end(p, end);
 				if (math_end) {
-					math_to_mathml(&g_html_buf, math_start,
-						       span_length(math_start, math_end), true);
+					math_to_mathml(&g_html_buf,
+						       math_start,
+						       span_length(math_start,
+								   math_end),
+						       true);
 					p = math_end + 2;
 				}
 			} else {
 				math_end = find_inline_math_end(p, end);
 				if (math_end) {
-					math_to_mathml(&g_html_buf, math_start,
-						       span_length(math_start, math_end), false);
+					math_to_mathml(&g_html_buf,
+						       math_start,
+						       span_length(math_start,
+								   math_end),
+						       false);
 					p = math_end + 1;
 				}
 			}
@@ -183,9 +208,10 @@ void render_text(const char *text, size_t len) {
 			} else {
 				// No closing $, treat as literal
 				buf_append(&g_html_buf, "$");
-				if (display) buf_append(&g_html_buf, "$");
+				if (display)
+					buf_append(&g_html_buf, "$");
 				start = math_start;
-				p = math_start;
+				p     = math_start;
 			}
 		} else {
 			p++;
@@ -204,56 +230,70 @@ static void render_line(const char *line, size_t len) {
 	}
 
 	switch (line[0]) {
-	case '#': {
-		const char *p = line;
-		size_t l = len;
-		int level = 0;
-		while (l && *p == '#') {
-			p++;
-			l--;
-			level++;
+		case '#' : {
+			const char *p = line;
+			size_t l      = len;
+			int level     = 0;
+			while (l && *p == '#') {
+				p++;
+				l--;
+				level++;
+			}
+			while (l && *p == ' ') {
+				p++;
+				l--;
+			}
+			buf_printf(&g_html_buf,
+				   "<h%d class=\"para\">",
+				   level <= 6 ? level : 6);
+			render_text(p, l);
+			buf_printf(&g_html_buf,
+				   "</h%d>",
+				   level <= 6 ? level : 6);
+			return;
 		}
-		while (l && *p == ' ') {
-			p++;
-			l--;
+		case '!' : {
+			if (len <= 4 || line[1] != '[')
+				break;
+
+			const char *alt_s = line + 2;
+			const char *alt_e = memchr(alt_s, ']', len - 2);
+			if (!alt_e || alt_e + 1 >= line + len
+			    || alt_e[1] != '(')
+				break;
+
+			const char *url_s = alt_e + 2;
+			size_t url_offset = span_length(line, url_s);
+			const char *url_e
+			    = memchr(url_s, ')', len - url_offset);
+			if (!url_e)
+				break;
+
+			add_image(url_s,
+				  span_length(url_s, url_e),
+				  alt_s,
+				  span_length(alt_s, alt_e),
+				  1.0f,
+				  0,
+				  0,
+				  0);
+			return;
 		}
-		buf_printf(&g_html_buf, "<h%d class=\"para\">", level <= 6 ? level : 6);
-		render_text(p, l);
-		buf_printf(&g_html_buf, "</h%d>", level <= 6 ? level : 6);
-		return;
-	}
-	case '!': {
-		if (len <= 4 || line[1] != '[')
-			break;
+		case '[' : {
+			if (len <= 10 || line[1] != '['
+			    || strncmp(line + 2, "graph:", 6) != 0)
+				break;
 
-		const char *alt_s = line + 2;
-		const char *alt_e = memchr(alt_s, ']', len - 2);
-		if (!alt_e || alt_e + 1 >= line + len || alt_e[1] != '(')
-			break;
+			const char *p = memchr(line, ']', len);
+			if (!p || p + 1 >= line + len || p[1] != ']')
+				break;
 
-		const char *url_s = alt_e + 2;
-		size_t url_offset = span_length(line, url_s);
-		const char *url_e = memchr(url_s, ')', len - url_offset);
-		if (!url_e)
+			render_graph_shortcode(line + 8,
+					       span_length(line + 8, p));
+			return;
+		}
+		default :
 			break;
-
-		add_image(url_s, span_length(url_s, url_e), alt_s,
-			  span_length(alt_s, alt_e), 1.0f, 0, 0, 0);
-		return;
-	}
-	case '[': {
-		if (len <= 10 || line[1] != '[' || strncmp(line + 2, "graph:", 6) != 0)
-			break;
-
-		const char *p = memchr(line, ']', len);
-		if (!p || p + 1 >= line + len || p[1] != ']')
-			break;
-
-		render_graph_shortcode(line + 8, span_length(line + 8, p));
-		return;
-	}
-	default:
-		break;
 	}
 
 	buf_append(&g_html_buf, "<p class=\"para\">");
@@ -261,63 +301,83 @@ static void render_line(const char *line, size_t len) {
 	buf_append(&g_html_buf, "</p>");
 }
 
-
 EMSCRIPTEN_KEEPALIVE
 void render_markdown(const char *content) {
 	const char *cur = content;
 	const char *next;
 	size_t len;
-	bool in_code = false;
-	const char *code_start = NULL;
-	const char *lang_start = NULL;
-	size_t lang_len = 0;
+	bool in_code		= false;
+	const char *code_start	= NULL;
+	const char *lang_start	= NULL;
+	size_t lang_len		= 0;
 	bool allow_front_matter = true;
-	bool in_front_matter = false;
-	bool in_math = false;
-	const char *math_start = NULL;
+	bool in_front_matter	= false;
+	bool in_math		= false;
+	const char *math_start	= NULL;
 
-	if (!content) return;
+	if (!content)
+		return;
 
 	while (*cur) {
 		next = strchr(cur, '\n');
-		len = next ? (size_t)(next - cur) : strlen(cur);
+		len  = next ? (size_t) (next - cur) : strlen(cur);
 
-		if (len > 0 && cur[len - 1] == '\r') len--;
+		if (len > 0 && cur[len - 1] == '\r')
+			len--;
 
 		if (len >= 3 && !strncmp(cur, "```", 3)) {
 			if (!in_code) {
-				in_code = true;
+				in_code	   = true;
 				lang_start = cur + 3;
-				lang_len = len - 3;
+				lang_len   = len - 3;
 				code_start = next ? next + 1 : NULL;
 			} else {
 				if (code_start) {
-					size_t clen = span_length(code_start, cur);
-					if (clen > 0 && code_start[clen - 1] == '\n') clen--;
-					add_code_block((struct str_view){lang_start, lang_len}, (struct str_view){code_start, clen});
+					size_t clen
+					    = span_length(code_start, cur);
+					if (clen > 0
+					    && code_start[clen - 1] == '\n')
+						clen--;
+					add_code_block(
+					    (struct str_view){lang_start,
+							      lang_len},
+					    (struct str_view){code_start,
+							      clen});
 				}
 				in_code = false;
 			}
 		} else if (!in_code) {
 			if (is_math_block_delim(cur, len)) {
 				if (!in_math) {
-					in_math = true;
+					in_math	   = true;
 					math_start = next ? next + 1 : NULL;
 				} else {
 					if (math_start && cur > math_start) {
-						size_t mlen = span_length(math_start, cur);
-						while (mlen > 0 && (math_start[mlen - 1] == '\n' || math_start[mlen - 1] == '\r')) {
+						size_t mlen
+						    = span_length(math_start,
+								  cur);
+						while (mlen > 0
+						       && (math_start[mlen - 1]
+							       == '\n'
+							   || math_start[mlen
+									 - 1]
+								  == '\r')) {
 							mlen--;
 						}
-						math_to_mathml(&g_html_buf, math_start, mlen, true);
+						math_to_mathml(&g_html_buf,
+							       math_start,
+							       mlen,
+							       true);
 					}
 					in_math = false;
 				}
 			} else if (!in_math) {
-				if (allow_front_matter && !in_front_matter && is_front_matter_delim(cur, len)) {
+				if (allow_front_matter && !in_front_matter
+				    && is_front_matter_delim(cur, len)) {
 					in_front_matter = true;
-				} else if (in_front_matter && is_front_matter_delim(cur, len)) {
-					in_front_matter = false;
+				} else if (in_front_matter
+					   && is_front_matter_delim(cur, len)) {
+					in_front_matter	   = false;
 					allow_front_matter = false;
 				} else if (!in_front_matter) {
 					render_line(cur, len);
@@ -327,12 +387,14 @@ void render_markdown(const char *content) {
 			}
 		}
 
-		if (!next) break;
+		if (!next)
+			break;
 		cur = next + 1;
 	}
 }
 
 void load_article(int index) {
 	const char *body = get_article_body(index);
-	if (body) render_markdown(body);
+	if (body)
+		render_markdown(body);
 }

@@ -7,12 +7,17 @@
 #include "buffer.h"
 
 /**
- * math_to_mathml - Converts a LaTeX string to MathML and appends it to the buffer.
+ * math_to_mathml - Converts a LaTeX string to MathML and appends it to the
+ * buffer.
  * @param b The buffer to append to.
  * @param latex The LaTeX source string.
  * @param len Length of the LaTeX string.
- * @param display_mode If true, wraps in <math display="block">, otherwise <math>.
+ * @param display_mode If true, wraps in <math display="block">, otherwise
+ * <math>.
  */
-void math_to_mathml(Buffer *b, const char *latex, size_t len, bool display_mode);
+void math_to_mathml(Buffer *b,
+		    const char *latex,
+		    size_t len,
+		    bool display_mode);
 
 #endif

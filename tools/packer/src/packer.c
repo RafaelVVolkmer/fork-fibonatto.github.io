@@ -1,14 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Sergio Bonatto
 // SPDX-License-Identifier: MIT
 
+#include "packer.h"
+
+#include <ctype.h>
+#include <dirent.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <stdbool.h>
-#include <dirent.h>
 #include <sys/types.h>
-#include "packer.h"
 
 static struct post posts[MAX_POSTS];
 static int nr_posts;
@@ -19,17 +20,14 @@ static bool has_markdown_extension(const char *name) {
 }
 
 static bool is_valid_iso_date(const char *date) {
-	return strlen(date) == 10 &&
-	       isdigit((unsigned char)date[0]) &&
-	       isdigit((unsigned char)date[1]) &&
-	       isdigit((unsigned char)date[2]) &&
-	       isdigit((unsigned char)date[3]) &&
-	       date[4] == '-' &&
-	       isdigit((unsigned char)date[5]) &&
-	       isdigit((unsigned char)date[6]) &&
-	       date[7] == '-' &&
-	       isdigit((unsigned char)date[8]) &&
-	       isdigit((unsigned char)date[9]);
+	return strlen(date) == 10 && isdigit((unsigned char) date[0])
+	       && isdigit((unsigned char) date[1])
+	       && isdigit((unsigned char) date[2])
+	       && isdigit((unsigned char) date[3]) && date[4] == '-'
+	       && isdigit((unsigned char) date[5])
+	       && isdigit((unsigned char) date[6]) && date[7] == '-'
+	       && isdigit((unsigned char) date[8])
+	       && isdigit((unsigned char) date[9]);
 }
 
 static void fail(const char *msg, const char *detail) {
@@ -37,19 +35,22 @@ static void fail(const char *msg, const char *detail) {
 	exit(1);
 }
 
-static void copy_string(char *dst, size_t dst_cap, const char *src, const char *field) {
+static void copy_string(char *dst,
+			size_t dst_cap,
+			const char *src,
+			const char *field) {
 	size_t len = strlen(src);
 	if (len >= dst_cap)
 		fail("value exceeds fixed buffer", field);
 	memcpy(dst, src, len + 1);
 }
 
-static void sanitize_slug(char *dst, size_t dst_cap, const char *src){
+static void sanitize_slug(char *dst, size_t dst_cap, const char *src) {
 	size_t i = 0;
 	while (*src) {
 		if (i + 1 >= dst_cap)
 			fail("slug exceeds fixed buffer", src);
-		if (isalnum((unsigned char)*src))
+		if (isalnum((unsigned char) *src))
 			dst[i] = *src;
 		else
 			dst[i] = '_';
@@ -59,7 +60,7 @@ static void sanitize_slug(char *dst, size_t dst_cap, const char *src){
 	dst[i] = '\0';
 }
 
-static char *read_file(const char *path, size_t *len){
+static char *read_file(const char *path, size_t *len) {
 	FILE *f;
 	char *buf;
 	long sz_long;
@@ -75,7 +76,7 @@ static char *read_file(const char *path, size_t *len){
 		fclose(f);
 		return NULL;
 	}
-	sz = (size_t)sz_long;
+	sz = (size_t) sz_long;
 	rewind(f);
 
 	buf = malloc(sz + 1);
@@ -91,21 +92,23 @@ static char *read_file(const char *path, size_t *len){
 	}
 
 	buf[sz] = '\0';
-	*len = sz;
+	*len	= sz;
 	fclose(f);
 	return buf;
 }
 
 static void extract_value(char *dest, const char *src, size_t len, size_t max) {
 	const char *start = src;
-	const char *end = src + len;
+	const char *end	  = src + len;
 
-	while (start < end && (isspace((unsigned char)*start) || *start == '\x22'))
+	while (start < end
+	       && (isspace((unsigned char) *start) || *start == '\x22'))
 		start++;
-	while (end > start && (isspace((unsigned char)*(end - 1)) || *(end - 1) == '\x22'))
+	while (end > start
+	       && (isspace((unsigned char) *(end - 1)) || *(end - 1) == '\x22'))
 		end--;
 
-	size_t final_len = (size_t)(end - start);
+	size_t final_len = (size_t) (end - start);
 	if (final_len >= max)
 		fail("value exceeds fixed buffer", "front matter");
 
@@ -130,7 +133,7 @@ static void parse_meta(const char *buf, struct post *p) {
 
 	while (line && *line) {
 		const char *next = strchr(line, '\n');
-		size_t line_len = next ? (size_t)(next - line) : strlen(line);
+		size_t line_len	 = next ? (size_t) (next - line) : strlen(line);
 
 		if (line_len >= 3 && strncmp(line, "---", 3) == 0)
 			break;
@@ -140,15 +143,19 @@ static void parse_meta(const char *buf, struct post *p) {
 			char *dest;
 			size_t len;
 		} map[] = {
-			{ "title:",       p->title,       MAX_TITLE },
-			{ "date:",        p->date,        MAX_DATE },
-			{ "description:", p->description, MAX_DESCRIPTION },
+		  {	   "title:",	     p->title,       MAX_TITLE},
+		  {	   "date:",	    p->date,	     MAX_DATE},
+		  {"description:", p->description, MAX_DESCRIPTION},
 		};
 
 		for (int i = 0; i < 3; i++) {
 			size_t klen = strlen(map[i].key);
-			if (line_len >= klen && strncmp(line, map[i].key, klen) == 0) {
-				extract_value(map[i].dest, line + klen, line_len - klen, map[i].len);
+			if (line_len >= klen
+			    && strncmp(line, map[i].key, klen) == 0) {
+				extract_value(map[i].dest,
+					      line + klen,
+					      line_len - klen,
+					      map[i].len);
 				break;
 			}
 		}
@@ -157,54 +164,64 @@ static void parse_meta(const char *buf, struct post *p) {
 	}
 }
 
-static void dump_hex(const char *slug, const char *buf, size_t len){
+static void dump_hex(const char *slug, const char *buf, size_t len) {
 	size_t i;
 
 	printf("static const char post_data_%s[] = {\n\t", slug);
 	for (i = 0; i < len; i++) {
-		printf("0x%02x, ", (unsigned char)buf[i]);
+		printf("0x%02x, ", (unsigned char) buf[i]);
 		if ((i + 1) % 12 == 0)
 			printf("\n\t");
 	}
 	printf("0x00\n};\n\n");
 }
 
-static int cmp_date(const void *a, const void *b){
+static int cmp_date(const void *a, const void *b) {
 	const struct post *pa = a;
 	const struct post *pb = b;
 	return strcmp(pb->date, pa->date);
 }
 
 static int cmp_slug_post_index(const void *a, const void *b) {
-	const int ia = *(const int *)a;
-	const int ib = *(const int *)b;
+	const int ia = *(const int *) a;
+	const int ib = *(const int *) b;
 	return strcmp(posts[ia].slug, posts[ib].slug);
 }
 
 static void emit_c_string(const char *s) {
-	const unsigned char *p = (const unsigned char *)s;
+	const unsigned char *p = (const unsigned char *) s;
 
 	putchar('"');
 	while (*p) {
 		switch (*p) {
-		case '\\': fputs("\\\\", stdout); break;
-		case '"': fputs("\\\"", stdout); break;
-		case '\n': fputs("\\n", stdout); break;
-		case '\r': fputs("\\r", stdout); break;
-		case '\t': fputs("\\t", stdout); break;
-		default:
-			if (*p < 0x20) {
-				printf("\\x%02x", *p);
-			} else {
-				putchar(*p);
-			}
+			case '\\' :
+				fputs("\\\\", stdout);
+				break;
+			case '"' :
+				fputs("\\\"", stdout);
+				break;
+			case '\n' :
+				fputs("\\n", stdout);
+				break;
+			case '\r' :
+				fputs("\\r", stdout);
+				break;
+			case '\t' :
+				fputs("\\t", stdout);
+				break;
+			default :
+				if (*p < 0x20) {
+					printf("\\x%02x", *p);
+				} else {
+					putchar(*p);
+				}
 		}
 		p++;
 	}
 	putchar('"');
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv) {
 	DIR *d;
 	struct dirent *de;
 	char *buf;
@@ -231,13 +248,15 @@ int main(int argc, char **argv){
 
 		struct post *p = &posts[nr_posts];
 
-		if (snprintf(p->path, MAX_PATH, "%s/%s", argv[1], de->d_name) >= MAX_PATH)
+		if (snprintf(p->path, MAX_PATH, "%s/%s", argv[1], de->d_name)
+		    >= MAX_PATH)
 			fail("path exceeds fixed buffer", de->d_name);
-		
+
 		copy_string(p->slug, MAX_SLUG, de->d_name, "slug");
 		ext = strstr(p->slug, ".md");
-		if (ext) *ext = '\0';
-		
+		if (ext)
+			*ext = '\0';
+
 		sanitize_slug(c_slug, sizeof(c_slug), p->slug);
 		copy_string(p->slug, MAX_SLUG, c_slug, "slug");
 
@@ -256,7 +275,7 @@ int main(int argc, char **argv){
 	}
 	closedir(d);
 
-	qsort(posts, (size_t)nr_posts, sizeof(struct post), cmp_date);
+	qsort(posts, (size_t) nr_posts, sizeof(struct post), cmp_date);
 
 	printf("/* Blog Index */\n");
 	printf("const struct blog_post posts[] = {\n");
@@ -277,18 +296,21 @@ int main(int argc, char **argv){
 		printf("\t}%s\n", (i < nr_posts - 1) ? "," : "");
 	}
 	printf("};\n\n");
-	
+
 	printf("const int posts_count = %d;\n\n", nr_posts);
 
 	for (i = 0; i < nr_posts; i++)
 		slug_order[i] = i;
-	qsort(slug_order, (size_t)nr_posts, sizeof(int), cmp_slug_post_index);
+	qsort(slug_order, (size_t) nr_posts, sizeof(int), cmp_slug_post_index);
 
-	printf("static const struct { const char *slug; int index; } post_slug_index[] = {\n");
+	printf("static const struct { const char *slug; int index; } "
+	       "post_slug_index[] = {\n");
 	for (i = 0; i < nr_posts; i++) {
 		printf("\t{ ");
 		emit_c_string(posts[slug_order[i]].slug);
-		printf(", %d }%s\n", slug_order[i], (i < nr_posts - 1) ? "," : "");
+		printf(", %d }%s\n",
+		       slug_order[i],
+		       (i < nr_posts - 1) ? "," : "");
 	}
 	printf("};\n\n");
 

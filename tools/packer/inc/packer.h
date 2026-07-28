@@ -9,7 +9,7 @@
 #define MAX_SLUG	128
 #define MAX_TITLE	256
 #define MAX_DATE	32
-#define MAX_DESCRIPTION	512
+#define MAX_DESCRIPTION 512
 
 struct post {
 	char path[MAX_PATH];
