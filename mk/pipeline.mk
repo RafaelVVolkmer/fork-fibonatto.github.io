@@ -7,11 +7,12 @@
 
 $(SOURCE_AUDIT_STAMP): \
 		$(SOURCE_MANIFEST) \
+		$(SOURCE_MANIFEST_TOOL) \
 		$(ALL_C_SOURCES) \
 		$(HEADERS) \
 		$(PACKER_SOURCE) \
 		$(PACKER_HEADER) | $(AUDIT_DIR)
-	@shasum -a 256 --check "$(SOURCE_MANIFEST)"
+	@./$(SOURCE_MANIFEST_TOOL) check "$(SOURCE_MANIFEST)"
 	@touch "$@"
 
 $(AUDIT_STAMP): \

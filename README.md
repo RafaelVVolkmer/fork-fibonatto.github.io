@@ -156,8 +156,10 @@ The audit report is written to `.build/audit/release-flags.txt`. A failed flag
 stops the release instead of being silently ignored.
 
 `core/sources.sha256` records the expected digest of every project-owned `.c`
-and `.h` file, including the packer. Both `make release` and `make audit`
-verify this manifest before compiling.
+and `.h` file, including the packer. `make update-sources` regenerates the
+complete, deterministically sorted inventory. The audit compares the generated
+manifest byte-for-byte with the committed file, so added and removed sources
+are detected alongside content changes.
 
 Project-owned C compiles with the supported warning set promoted to errors.
 Diagnostics intrinsic to Emscripten's `EM_JS` macro expansion are suppressed
@@ -173,6 +175,7 @@ make build
 make debug
 make audit
 make audit-sources
+make update-sources
 make validate
 make sbom
 make hash-names

@@ -35,6 +35,7 @@
 	test-release \
 	test-sanitizers \
 	tests \
+	update-sources \
 	validate \
 	_clean \
 	_release
@@ -90,6 +91,9 @@ audit: check-tools $(SOURCE_AUDIT_STAMP) $(AUDIT_STAMP)
 
 audit-sources: $(SOURCE_AUDIT_STAMP)
 	@echo "C/H integrity verified against $(SOURCE_MANIFEST)"
+
+update-sources:
+	@./$(SOURCE_MANIFEST_TOOL) generate "$(SOURCE_MANIFEST)"
 
 validate: build
 
@@ -211,6 +215,7 @@ help:
 	@echo "  make test-release      Run binary and reproducibility release tests"
 	@echo "  make audit             Audit the toolchain and every release flag"
 	@echo "  make audit-sources     Verify C/H files byte-for-byte"
+	@echo "  make update-sources    Regenerate the tracked C/H source manifest"
 	@echo "  make validate          Incremental build + dist/ validation"
 	@echo "  make sbom              Generate optional CycloneDX and SPDX SBOMs"
 	@echo "  make hash-names        Verify application content-addressed names"

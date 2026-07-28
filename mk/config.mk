@@ -31,6 +31,7 @@ PACKER := $(PACKER_BUILD_DIR)/release/packer
 PACKER_SOURCE := $(PACKER_DIR)/src/packer.c
 PACKER_HEADER := $(PACKER_DIR)/inc/packer.h
 SOURCE_MANIFEST := $(CORE_DIR)/sources.sha256
+SOURCE_MANIFEST_TOOL := scripts/source-manifest.sh
 WASM_IMPORT_ALLOWLIST := $(CORE_DIR)/wasm-imports.allow
 CONTENTS_HEADER := $(GENERATED_DIR)/contents_data.h
 ASSETS_HEADER := $(GENERATED_DIR)/assets.h
