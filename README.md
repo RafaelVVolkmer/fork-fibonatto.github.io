@@ -481,10 +481,10 @@ artifact. The SBOMs are published at
 source inventory is published at `/.metadata/sources.sha256`.
 
 Before upload, Playwright runs the local end-to-end suite against that exact
-`dist/`. After deployment, `smoke-pages.mjs` validates the public URL, hashed
-assets, WebAssembly header, SBOMs, signature status, source inventory, and
-browser execution. This keeps UI regressions separate from publication and
-integrity failures while covering both boundaries.
+`dist/`. After deployment, `tests/frontend/smoke-pages.mjs` validates the
+public URL, hashed assets, WebAssembly header, SBOMs, signature status, source
+inventory, and browser execution. This keeps UI regressions separate from
+publication and integrity failures while covering both boundaries.
 
 The canonical public origin is stored in `site/url.txt`. Because `dist/` is the
 Pages document root, `dist/sitemap.xml` is published as `/sitemap.xml`; the

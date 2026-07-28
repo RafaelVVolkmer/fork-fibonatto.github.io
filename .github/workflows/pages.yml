@@ -269,6 +269,8 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Verify the deployed site
-        run: node scripts/tests/smoke-pages.mjs "${{ needs.deploy.outputs.page_url }}"
+        run: >-
+          node tests/frontend/smoke-pages.mjs
+          "${{ needs.deploy.outputs.page_url }}"
 
 # EOF
