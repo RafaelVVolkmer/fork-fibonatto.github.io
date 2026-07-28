@@ -11,8 +11,12 @@
 *.conf text eol=lf
 *.h text eol=lf diff=cpp
 *.html text eol=lf diff=html
+*.js text eol=lf
 *.json text eol=lf
 *.md text eol=lf diff=markdown
+*.mjs text eol=lf
+*.mk text eol=lf
+*.rego text eol=lf
 *.sha256 text eol=lf
 *.sh text eol=lf diff=bash
 *.svg text eol=lf
@@ -28,6 +32,7 @@
 .emscripten-version text eol=lf
 .syft-version text eol=lf
 .terser-version text eol=lf
+.editorconfig text eol=lf
 .gitattributes text eol=lf
 .gitignore text eol=lf
 .gitmodules text eol=lf
