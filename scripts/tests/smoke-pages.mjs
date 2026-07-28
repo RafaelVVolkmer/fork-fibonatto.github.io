@@ -47,6 +47,25 @@ if (!expectedMagic.every((byte, index) => wasmBytes[index] === byte)) {
   throw new Error("Published WebAssembly asset has an invalid header");
 }
 
+const metadataChecks = [
+  [".metadata/cosign.status.json", "subject", "release.sha256"],
+  [".metadata/sbom.spdx.json", "spdxVersion", "SPDX-"],
+  [".metadata/sbom.cyclonedx.json", "bomFormat", "CycloneDX"],
+];
+
+for (const [path, property, expected] of metadataChecks) {
+  const metadataUrl = new URL(path, response.url);
+  const metadataResponse = await fetch(metadataUrl);
+  if (!metadataResponse.ok) {
+    throw new Error(`${path} returned HTTP ${metadataResponse.status}`);
+  }
+
+  const metadata = await metadataResponse.json();
+  if (!String(metadata[property]).startsWith(expected)) {
+    throw new Error(`${path} does not contain a valid ${property}`);
+  }
+}
+
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();
 const pageErrors = [];

@@ -205,34 +205,7 @@ EM_JS(void, sys_render_footer, (const char *style_ptr, const char *url_ptr), {
 	github.textContent   = 'GitHub';
 
 	meta.append(copyright, dot1, vim, dot2, github);
-
-	const artifactNav = document.createElement('nav');
-	artifactNav.setAttribute('aria-label', 'Site artifacts');
-	artifactNav.style.cssText =
-	    'font-size:14px;display:flex;justify-content:flex-end;gap:12px;'
-	    + 'flex-wrap:wrap;';
-
-	const siteRoot = new URL('.', document.baseURI);
-	const artifacts = [
-		['Sitemap', 'sitemap.xml'],
-		['Robots', 'robots.txt'],
-		['CycloneDX', '.metadata/sbom.cyclonedx.json'],
-		['SPDX', '.metadata/sbom.spdx.json'],
-		['Cosign', '.metadata/cosign.status.json'],
-		['REUSE', 'REUSE.toml'],
-		['License', 'LICENSES/MIT.txt'],
-	];
-
-	for (const [label, path] of artifacts) {
-		const link	     = document.createElement('a');
-		link.href	     = new URL(path, siteRoot).href;
-		link.style.cssText =
-		    'color:var(--text-color);text-decoration:none;';
-		link.textContent = label;
-		artifactNav.appendChild(link);
-	}
-
-	row.append(meta, artifactNav);
+	row.appendChild(meta);
 	outer.appendChild(row);
 	footer.replaceChildren(outer);
 });
