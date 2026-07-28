@@ -90,8 +90,7 @@ RUN ./docker/scripts/test-artifacts.sh \
 
 FROM ${ALPINE_IMAGE} AS healthcheck-build
 
-RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
-	apk add build-base
+RUN apk add --no-cache build-base
 
 COPY --link docker/scripts/healthcheck.c /tmp/ehs-healthcheck.c
 
@@ -118,8 +117,7 @@ RUN cc \
 
 FROM ${ALPINE_IMAGE} AS certgen
 
-RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
-	apk add bash openssl
+RUN apk add --no-cache bash openssl
 
 COPY --link --chmod=0555 \
 	docker/scripts/generate-dev-cert.sh \
