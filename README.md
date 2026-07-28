@@ -204,12 +204,13 @@ to `tools/packer/Makefile`. They produce independent binaries under
 debug symbols, frame pointers, disabled inlining, automatic-variable
 initialization, and sanitizers.
 
-`make build` is the incremental equivalent of the release pipeline. `make
-debug` creates an independently audited WebAssembly build in `.build/debug/`
-with debug symbols, frame pointers, deterministic path remapping,
+`make build` is the incremental equivalent of the release pipeline and leaves
+source-manifest policy checks to validation and release gates. `make debug`
+creates an independently audited WebAssembly build in `.build/debug/` with
+debug symbols, frame pointers, deterministic path remapping,
 ASan/UBSan/LSan/alignment instrumentation, Emscripten assertions, and strict
-stack checks. Both profiles reject warnings and unknown or unused flags.
-Both also declare the stable bulk-memory, non-trapping float conversion,
+stack checks. Both profiles reject warnings and unknown or unused flags. Both
+also declare the stable bulk-memory, non-trapping float conversion,
 sign-extension, multi-value, and reference-types WebAssembly features.
 
 GCC analyzer diagnostics and ELF linker hardening apply to the native packer.

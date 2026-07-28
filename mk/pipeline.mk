@@ -22,8 +22,7 @@ $(AUDIT_STAMP): \
 		.terser-version \
 		$(PACKER_DIR)/Makefile \
 		scripts/build.sh \
-		scripts/toolchain.sh \
-		$(SOURCE_AUDIT_STAMP) | $(AUDIT_DIR) check-tools
+		scripts/toolchain.sh | $(AUDIT_DIR) check-tools
 	@EMCC="$(EMCC)" \
 	EHS_EMCC_ARGS='$(EMCC_ARGS)' \
 	WASM_OPT="$(WASM_OPT)" \
@@ -52,8 +51,7 @@ $(DEBUG_AUDIT_STAMP): \
 		.terser-version \
 		$(PACKER_DIR)/Makefile \
 		scripts/build.sh \
-		scripts/toolchain.sh \
-		$(SOURCE_AUDIT_STAMP) | $(AUDIT_DIR) check-tools
+		scripts/toolchain.sh | $(AUDIT_DIR) check-tools
 	@EMCC="$(EMCC)" \
 	EHS_EMCC_ARGS='$(EMCC_ARGS)' \
 	WASM_OPT="$(WASM_OPT)" \
