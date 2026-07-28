@@ -9,7 +9,7 @@
 # - Runs native system tools for shell, data, documentation and workflow checks.
 # - Provides optional C formatting and static-analysis checks for explicit use.
 # - Accepts "all" or one or more named checks and reports an aggregate result.
-# - Reads every tool policy from lint/ and never installs or modifies tools.
+# - Reads policies from static/ without installing or changing tools.
 # ==============================================================================
 
 # The runner intentionally omits errexit so independent checks continue after a
@@ -17,10 +17,10 @@
 set -uo pipefail
 
 # ------------------------------------------------------------------------------
-# Repository root and lint configuration directory
+# Repository root and static-analysis configuration directory
 # ------------------------------------------------------------------------------
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-lint_dir="$project_root/lint"
+analysis_dir="$project_root/static"
 cd "$project_root" || exit 1
 
 # ------------------------------------------------------------------------------
@@ -96,16 +96,17 @@ done
 # Deterministic file inventories
 # ------------------------------------------------------------------------------
 mapfile -d '' shell_files < <(
-	find scripts lint docker -type f -name '*.sh' -print0 | sort -z
+	find scripts "$analysis_dir" docker -type f -name '*.sh' -print0 | sort -z
 )
 mapfile -d '' yaml_files < <(
-	find .github lint -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | sort -z
+	find .github "$analysis_dir" -type f \
+		\( -name '*.yaml' -o -name '*.yml' \) -print0 | sort -z
 )
 mapfile -d '' toml_files < <(
-	find lint -type f -name '*.toml' -print0 | sort -z
+	find "$analysis_dir" -type f -name '*.toml' -print0 | sort -z
 )
 mapfile -d '' json_files < <(
-	find lint -type f -name '*.json' -print0 | sort -z
+	find versions.json "$analysis_dir" -type f -name '*.json' -print0 | sort -z
 )
 mapfile -d '' workflow_files < <(
 	find .github/workflows -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | sort -z
@@ -114,7 +115,7 @@ mapfile -d '' c_files < <(
 	find core tests tools/packer -type f \( -name '*.c' -o -name '*.h' \) -print0 | sort -z
 )
 mapfile -d '' link_files < <(
-	find README.md content lint site -type f \
+	find README.md content "$analysis_dir" site -type f \
 		\( -name '*.md' -o -name '*.html' -o -name '*.tmpl' \) \
 		-print0 | sort -z
 )
@@ -125,7 +126,7 @@ mapfile -d '' link_files < <(
 shfmt_flags=()
 while IFS= read -r flag; do
 	[[ -n "$flag" && "$flag" != \#* ]] && shfmt_flags+=("$flag")
-done < "$lint_dir/shell/shfmt.args"
+done < "$analysis_dir/shell/shfmt.args"
 
 # ------------------------------------------------------------------------------
 # JSON parser policy
@@ -133,7 +134,7 @@ done < "$lint_dir/shell/shfmt.args"
 jq_flags=()
 while IFS= read -r flag; do
 	[[ -n "$flag" && "$flag" != \#* ]] && jq_flags+=("$flag")
-done < "$lint_dir/json/jq.args"
+done < "$analysis_dir/json/jq.args"
 
 # ------------------------------------------------------------------------------
 # Shell checks
@@ -142,7 +143,7 @@ check_shellcheck() {
 	local severity
 
 	severity="$(
-		sed -n 's/^severity=//p' "$lint_dir/shell/shellcheckrc"
+		sed -n 's/^severity=//p' "$analysis_dir/shell/shellcheckrc"
 	)"
 	shellcheck \
 		--severity="$severity" \
@@ -161,13 +162,13 @@ check_shell_format() {
 check_yaml() {
 	yamllint \
 		--strict \
-		--config-file "$lint_dir/yml/yamllint.yml" \
+		--config-file "$analysis_dir/yml/yamllint.yml" \
 		"${yaml_files[@]}"
 }
 
 check_toml() {
 	taplo lint \
-		--config "$lint_dir/toml/taplo.toml" \
+		--config "$analysis_dir/toml/taplo.toml" \
 		--no-auto-config \
 		"${toml_files[@]}"
 }
@@ -193,9 +194,9 @@ check_markdown() {
 	)"
 
 	rumdl check \
-		--config "$lint_dir/md/rumdl.toml" \
+		--config "$analysis_dir/md/rumdl.toml" \
 		README.md \
-		lint/README.md || return
+		static/README.md || return
 
 	# Published posts retain their existing typography. Audit only rules that
 	# detect malformed Markdown without mechanically rewriting article prose.
@@ -207,7 +208,7 @@ check_markdown() {
 
 check_actions() {
 	actionlint \
-		-config-file "$lint_dir/compliance/actionlint.yaml" \
+		-config-file "$analysis_dir/compliance/actionlint.yaml" \
 		-shellcheck shellcheck \
 		"${workflow_files[@]}"
 }
@@ -217,12 +218,12 @@ check_dockerfile() {
 }
 
 check_links() {
-	lychee --config "$lint_dir/md/lychee.toml" "${link_files[@]}"
+	lychee --config "$analysis_dir/md/lychee.toml" "${link_files[@]}"
 }
 
 check_typos() {
 	typos \
-		--config "$lint_dir/compliance/typos.toml" \
+		--config "$analysis_dir/compliance/typos.toml" \
 		--isolated \
 		--force-exclude \
 		.
@@ -235,7 +236,7 @@ check_clang_format() {
 	clang-format \
 		--dry-run \
 		--Werror \
-		--style="file:$lint_dir/c/clang-format.yml" \
+		--style="file:$analysis_dir/c/clang-format.yml" \
 		"${c_files[@]}"
 }
 
@@ -263,7 +264,7 @@ check_clang_tidy() {
 	# differences in warning-option recognition during this secondary analysis.
 	clang-tidy \
 		--quiet \
-		--config-file="$lint_dir/c/clang-tidy.yml" \
+		--config-file="$analysis_dir/c/clang-tidy.yml" \
 		-p "$project_root" \
 		--extra-arg=-Wno-unknown-warning-option \
 		--extra-arg=-Wno-unused-command-line-argument \
@@ -271,13 +272,13 @@ check_clang_tidy() {
 
 	clang-tidy \
 		--quiet \
-		--config-file="$lint_dir/c/clang-tidy.yml" \
+		--config-file="$analysis_dir/c/clang-tidy.yml" \
 		core/src/heart.c \
 		-- -std=c11 || return
 
 	clang-tidy \
 		--quiet \
-		--config-file="$lint_dir/c/clang-tidy.yml" \
+		--config-file="$analysis_dir/c/clang-tidy.yml" \
 		tools/packer/src/packer.c \
 		-- -std=c11 -Itools/packer/inc
 }
@@ -291,8 +292,8 @@ check_cppcheck() {
 		--language=c \
 		--std=c11 \
 		--suppress=missingIncludeSystem \
-		--suppressions-list="$lint_dir/c/cppcheck-suppressions.txt" \
-		-I"$lint_dir/c" \
+		--suppressions-list="$analysis_dir/c/cppcheck-suppressions.txt" \
+		-I"$analysis_dir/c" \
 		-Icore/inc \
 		-I.build/generated \
 		-Itools/packer/inc \

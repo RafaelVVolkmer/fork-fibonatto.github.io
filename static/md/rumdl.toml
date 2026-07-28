@@ -20,7 +20,7 @@ exclude = [
 ]
 include = [
   "README.md",
-  "lint/**/*.md",
+  "static/**/*.md",
 ]
 respect_gitignore = true
 

@@ -17,7 +17,7 @@ set -euo pipefail
 # Absolute paths, destination, and temporary workspace
 # ------------------------------------------------------------------------------
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-versions_file="$project_root/lint/json/versions.json"
+versions_file="$project_root/versions.json"
 destination="${LINT_BIN_DIR:-$project_root/.cache/lint/bin}"
 temporary_dir="$(mktemp -d)"
 trap 'rm -rf "$temporary_dir"' EXIT
@@ -26,7 +26,7 @@ trap 'rm -rf "$temporary_dir"' EXIT
 # Supported platform and bootstrap dependency checks
 # ------------------------------------------------------------------------------
 [[ "$(uname -s)" == "Linux" && "$(uname -m)" == "x86_64" ]] || {
-	echo "lint/json/versions.json pins Linux x86-64 executables." >&2
+	echo "versions.json pins Linux x86-64 executables." >&2
 	exit 1
 }
 

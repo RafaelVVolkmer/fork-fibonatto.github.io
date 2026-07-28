@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Sergio Bonatto
 SPDX-License-Identifier: MIT
 -->
 
-# Lint system
+# Static analysis system
 
 The repository uses native command-line tools from the host system, plus one
 digest-pinned Checkov container for Dockerfile policy checks. No project-local
@@ -76,12 +76,12 @@ Configuration is grouped by the source or assurance domain it validates:
 | `shell/` | ShellCheck and shfmt |
 | `yml/` | yamllint |
 | `toml/` | Taplo |
-| `json/` | jq and the pinned executable manifest |
+| `json/` | jq parser policy |
 | `md/` | rumdl and Lychee |
 | `compliance/` | Actions, spelling, and SBOM policies |
 
-The installer lives with the other executable helpers under `scripts/`; `lint/`
-contains only declarative policy and its documentation.
+The installer lives with the other executable helpers under `scripts/`;
+`static/` contains only declarative policy and its documentation.
 
 Repository documentation uses the configured Markdown rule set. Existing
 published posts retain their original typography and are checked against a
@@ -108,4 +108,4 @@ prose.
 
 The lint workflow downloads pinned Linux x86-64 release binaries into the
 runner's temporary directory and verifies every SHA-256 digest from
-`json/versions.json`. Nothing is installed globally.
+the root `versions.json`. Nothing is installed globally.

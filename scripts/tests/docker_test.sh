@@ -20,8 +20,8 @@ project_root="$(
 readonly project_root
 readonly dockerfile="$project_root/docker/Dockerfile"
 readonly compose_file="$project_root/docker/compose.yml"
-readonly lint_dir="$project_root/lint"
-readonly docker_lint_dir="$lint_dir/docker"
+readonly analysis_dir="$project_root/static"
+readonly docker_analysis_dir="$analysis_dir/docker"
 readonly audit_cache="$project_root/.cache/container-audit"
 readonly checkov_image="bridgecrew/checkov:3.3.8@sha256:c64ffb6d6fc8087c896341a2c697770a04a1cf558db04fa7b8129d8ca6bce336"
 
@@ -61,7 +61,7 @@ lint_definitions() {
 	require_command hadolint
 
 	hadolint \
-		--config "$docker_lint_dir/hadolint.yml" \
+		--config "$docker_analysis_dir/hadolint.yml" \
 		"$dockerfile"
 	pass "Hadolint Dockerfile policy"
 
@@ -80,18 +80,18 @@ lint_definitions() {
 		--volume "$project_root:/workspace:ro" \
 		--workdir /workspace \
 		"$checkov_image" \
-		--config-file lint/docker/checkov.yml
+		--config-file static/docker/checkov.yml
 	pass "Checkov Dockerfile policies"
 
 	conftest test \
 		--all-namespaces \
 		--parser dockerfile \
-		--policy "$docker_lint_dir/policies/dockerfile" \
+		--policy "$docker_analysis_dir/policies/dockerfile" \
 		"$dockerfile"
 	conftest test \
 		--all-namespaces \
 		--parser yaml \
-		--policy "$docker_lint_dir/policies/compose" \
+		--policy "$docker_analysis_dir/policies/compose" \
 		"$compose_file"
 	pass "Conftest OPA policies"
 }
@@ -142,7 +142,7 @@ scan_hardening() {
 
 	dive \
 		--ci \
-		--ci-config "$docker_lint_dir/dive-ci.yml" \
+		--ci-config "$docker_analysis_dir/dive-ci.yml" \
 		--source docker \
 		"$image"
 	pass "Dive layer efficiency audit"
@@ -151,7 +151,7 @@ scan_hardening() {
 test_structure() {
 	local target="$1"
 	local image="$2"
-	local config="$docker_lint_dir/container-structure-$target.yml"
+	local config="$docker_analysis_dir/container-structure-$target.yml"
 
 	container-structure-test test \
 		--image "$image" \
