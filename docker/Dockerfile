@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1.8
+# check=error=true
 
 # SPDX-FileCopyrightText: 2026 Sergio Bonatto
 # SPDX-License-Identifier: MIT
@@ -15,12 +16,16 @@ ARG NGINX_IMAGE="nginxinc/nginx-unprivileged:1.30.4-alpine-slim@sha256:e88d990b3
 
 FROM --platform=$BUILDPLATFORM ${EMSDK_IMAGE} AS build
 
+# The root user is confined to this disposable compiler stage.
+# hadolint ignore=DL3002
 USER root
 WORKDIR /workspace
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV EM_CACHE=/workspace/.cache/emscripten
 
+# Distribution package versions intentionally remain live; see README.
+# hadolint ignore=DL3008
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	--mount=type=cache,target=/var/lib/apt,sharing=locked \
 	apt-get update \
@@ -90,6 +95,8 @@ RUN ./docker/scripts/test-artifacts.sh \
 
 FROM ${ALPINE_IMAGE} AS healthcheck-build
 
+# Distribution package versions intentionally remain live; see README.
+# hadolint ignore=DL3018
 RUN apk add --no-cache build-base
 
 COPY --link docker/scripts/healthcheck.c /tmp/ehs-healthcheck.c
@@ -117,6 +124,8 @@ RUN cc \
 
 FROM ${ALPINE_IMAGE} AS certgen
 
+# Distribution package versions intentionally remain live; see README.
+# hadolint ignore=DL3018
 RUN apk add --no-cache bash openssl
 
 COPY --link --chmod=0555 \

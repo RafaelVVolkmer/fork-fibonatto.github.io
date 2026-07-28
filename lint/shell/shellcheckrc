@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+# Static-analysis policy for every project shell script.
+severity=warning
+external-sources=true
+source-path=SCRIPTDIR

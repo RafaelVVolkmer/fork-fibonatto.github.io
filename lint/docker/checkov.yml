@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+compact: true
+file:
+  - docker/Dockerfile
+framework:
+  - dockerfile
+quiet: true
+skip-check:
+  # The pinned image is supplied through an ARG resolved by BuildKit.
+  - CKV_DOCKER_7
+  # Package installation occurs only in the discarded compiler stage.
+  - CKV_DOCKER_9
+
+# EOF

@@ -214,7 +214,7 @@ generate_sboms() {
 	cp -R "$dist_dir/." "$scan_dir/"
 	rm -rf "$scan_dir/.metadata"
 	SYFT_CACHE_DIR="$project_root/.cache/syft" "$syft" \
-		--config "$project_root/lint/syft.yml" \
+		--config "$project_root/lint/compliance/syft.yml" \
 		scan "dir:$scan_dir" \
 		--source-name "$source_name" \
 		--source-version "$source_version" \

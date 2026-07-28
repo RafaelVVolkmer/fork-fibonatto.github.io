@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Sergio Bonatto
 # SPDX-License-Identifier: MIT
 
+# Markdown style policy for repository documentation.
 [global]
 disable = [
   "MD013",

@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+# Canonical formatter arguments for every project shell script.
+-ln=bash
+-i=0
+-ci
+-sr
+-bn

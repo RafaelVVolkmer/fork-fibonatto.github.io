@@ -23,7 +23,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  dockerfile:
+    name: Validate Docker definitions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c  # v4.2.0
+
+      - name: Install Docker definition linters
+        env:
+          LINT_BIN_DIR: ${{ runner.temp }}/ehs-docker-lint-bin
+        run: |
+          ./scripts/install-tools.sh conftest hadolint
+          echo "${LINT_BIN_DIR}" >> "${GITHUB_PATH}"
+
+      - name: Run the pre-build Docker gate
+        run: ./scripts/tests/docker_test.sh lint
+
   build:
+    needs: dockerfile
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     permissions:
@@ -71,16 +94,23 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.target }}
           cache-to: type=gha,mode=max,scope=${{ matrix.target }}
 
-      - name: Block vulnerable container images
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
-        with:
-          scan-type: image
-          image-ref: ${{ steps.metadata.outputs.local_tag }}
-          scanners: vuln,secret,misconfig
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
-          format: table
+      - name: Install image audit tools
+        env:
+          LINT_BIN_DIR: ${{ runner.temp }}/ehs-image-audit-bin
+        run: |
+          ./scripts/install-tools.sh \
+            container-structure-test \
+            dive \
+            dockle \
+            grype \
+            trivy
+          echo "${LINT_BIN_DIR}" >> "${GITHUB_PATH}"
+
+      - name: Run the post-build image gate
+        run: >-
+          ./scripts/tests/docker_test.sh image
+          "${{ matrix.target }}"
+          "${{ steps.metadata.outputs.local_tag }}"
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'

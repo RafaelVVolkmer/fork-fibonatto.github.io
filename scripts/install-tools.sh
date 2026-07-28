@@ -7,7 +7,7 @@
 # install-tools.sh — install pinned standalone lint executables
 #
 # - Reads versions, URLs, archive formats and SHA-256 digests from versions.json.
-# - Installs tools into LINT_BIN_DIR or the project-local .cache/lint/bin.
+# - Installs selected tools into LINT_BIN_DIR or .cache/lint/bin.
 # - Verifies every download before extracting or installing it.
 # ==============================================================================
 
@@ -17,7 +17,7 @@ set -euo pipefail
 # Absolute paths, destination, and temporary workspace
 # ------------------------------------------------------------------------------
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-versions_file="$project_root/lint/versions.json"
+versions_file="$project_root/lint/json/versions.json"
 destination="${LINT_BIN_DIR:-$project_root/.cache/lint/bin}"
 temporary_dir="$(mktemp -d)"
 trap 'rm -rf "$temporary_dir"' EXIT
@@ -26,7 +26,7 @@ trap 'rm -rf "$temporary_dir"' EXIT
 # Supported platform and bootstrap dependency checks
 # ------------------------------------------------------------------------------
 [[ "$(uname -s)" == "Linux" && "$(uname -m)" == "x86_64" ]] || {
-	echo "lint/versions.json currently pins Linux x86-64 executables." >&2
+	echo "lint/json/versions.json pins Linux x86-64 executables." >&2
 	exit 1
 }
 
@@ -118,9 +118,29 @@ install_tool() {
 }
 
 # ------------------------------------------------------------------------------
-# Pinned lint tool inventory
+# Pinned lint tool inventory and optional explicit selection
 # ------------------------------------------------------------------------------
-for tool in actionlint lychee rumdl shfmt taplo typos; do
+default_tools=(
+	actionlint
+	conftest
+	hadolint
+	lychee
+	rumdl
+	shfmt
+	taplo
+	typos
+)
+
+requested_tools=("$@")
+if [[ "${#requested_tools[@]}" -eq 0 ]]; then
+	requested_tools=("${default_tools[@]}")
+fi
+
+for tool in "${requested_tools[@]}"; do
+	jq -e --arg name "$tool" 'has($name)' "$versions_file" > /dev/null || {
+		echo "Unknown pinned tool: $tool" >&2
+		exit 2
+	}
 	install_tool "$tool"
 done
 

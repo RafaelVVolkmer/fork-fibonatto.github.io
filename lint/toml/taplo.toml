@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Sergio Bonatto
 # SPDX-License-Identifier: MIT
 
+# Shared TOML syntax and formatting policy.
 include = ["lint/**/*.toml"]
 
 [formatting]

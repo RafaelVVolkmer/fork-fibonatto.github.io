@@ -35,6 +35,9 @@ jobs:
           lfs: true
           submodules: recursive
 
+      - name: Set up Buildx for Docker definition checks
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c  # v4.2.0
+
       - name: Restore project toolchain caches
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
@@ -76,7 +79,7 @@ jobs:
         env:
           LINT_BIN_DIR: ${{ runner.temp }}/ehs-lint-bin
         run: |
-          ./lint/install-tools.sh
+          ./scripts/install-tools.sh
           echo "${LINT_BIN_DIR}" >> "${GITHUB_PATH}"
 
       - name: Verify source manifest

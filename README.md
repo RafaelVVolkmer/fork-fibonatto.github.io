@@ -59,7 +59,7 @@ The host must provide:
 - Syft (optional; used to generate the two SBOMs)
 - Cosign (optional locally; required and pinned in GitHub Actions)
 - ClangFormat, Clang-Tidy, Cppcheck, ShellCheck, yamllint, `jq`, and the
-  standalone lint tools pinned in `lint/versions.json`
+  standalone lint tools pinned in `lint/json/versions.json`
 
 On Ubuntu or Debian:
 
@@ -69,7 +69,7 @@ sudo apt-get install \
   shellcheck yamllint
 git lfs install
 npm install --global "terser@$(sed -n '1p' .terser-version)"
-./lint/install-tools.sh
+./scripts/install-tools.sh
 ```
 
 On macOS with Homebrew:
@@ -285,9 +285,9 @@ packaged build copies that exact database to
 then delegates to `scripts/lint.sh`. The lint system uses host-native
 executables for ShellCheck, shell formatting, YAML, TOML, JSON, Markdown,
 GitHub Actions, links, spelling, Clang formatting/static analysis, and
-Cppcheck. It does not use npm, npx, a JavaScript package manifest, or a
-project-local Node dependency tree. See `lint/README.md` for individual
-selectors and prerequisites.
+Cppcheck, plus a digest-pinned Checkov container for Dockerfile policy checks.
+Docker shell programs are included in the ShellCheck and shfmt inventories.
+See `lint/README.md` for individual selectors and prerequisites.
 
 Build commands can be overridden when tools are installed under different
 names:
@@ -337,7 +337,7 @@ available to Emscripten's compiler, runtime settings, `wasm-ld`, and Binaryen.
 │       └── Makefile        Standalone release/debug build
 ├── scripts/                Build, audit, packaging, and validation helpers
 ├── mk/                     Ordered GNU Make configuration and build fragments
-├── lint/                   Native lint runner, configs, and pinned CI tools
+├── lint/                   Lint policies grouped by source domain
 ├── logs/                   Ignored per-profile Make invocation logs
 ├── .github/workflows/      GitHub Pages build and deployment
 ├── .build/                 Disposable generated headers and intermediates
@@ -471,7 +471,7 @@ to use **GitHub Actions**.
 The container stack lives entirely under `docker/` and is built through
 Compose. Its application image is compiled with the official
 `emscripten/emsdk:6.0.4` builder and served by the non-root official
-`nginxinc/nginx-unprivileged:1.28.1-alpine-slim` runtime. The default
+`nginxinc/nginx-unprivileged:1.30.4-alpine-slim` runtime. The default
 Emscripten, Alpine, and NGINX references include manifest digests; updating a
 base image is therefore an explicit source change.
 
@@ -527,10 +527,30 @@ TLS port, and deliberately review digest updates. NGINX rate and connection
 limits mitigate application-layer abuse and slow clients, but volumetric DDoS
 protection still belongs at the network, CDN, or cloud edge.
 
-The container workflow builds `runtime` and `edge` with Buildx. Main- and develop-branch
-images are pushed to GHCR with BuildKit SBOM and `mode=max` provenance
-attestations; pull requests build and verify the same targets without
-publishing.
+Before building either application image, the container workflow runs
+Hadolint, Docker Buildx checks, Checkov, and repository-specific Conftest/OPA
+policies over the Dockerfile and Compose model. After each local `runtime` and
+`edge` build, Trivy and Grype block fixable high or critical vulnerabilities,
+Dockle audits image hardening, Dive enforces layer-efficiency limits, and
+Container Structure Test validates the target's files and OCI metadata.
+
+Only images that pass both gates are pushed to GHCR on `main` and `develop`.
+Published images retain BuildKit SBOM and `mode=max` provenance attestations;
+pull requests execute the same build and audit without publishing. Every
+standalone scanner is version- and SHA-256-pinned, while the Checkov image is
+version- and digest-pinned. None of these checks requires a service API key.
+
+Run only the pre-build definition gate with:
+
+```sh
+./scripts/tests/docker_test.sh lint
+```
+
+After building the local Compose images, run the complete image gate with:
+
+```sh
+./scripts/tests/docker_test.sh images
+```
 
 Stop the stack with:
 

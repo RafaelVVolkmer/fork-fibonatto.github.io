@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+# Runtime contract for the edge image.
+schemaVersion: 2.0.0
+
+fileExistenceTests:
+  - name: Immutable NGINX configuration
+    path: /etc/nginx/nginx.conf
+    shouldExist: true
+    permissions: -r--r--r--
+
+  - name: Executable health probe
+    path: /usr/local/bin/healthcheck
+    shouldExist: true
+    permissions: -r-xr-xr-x
+
+  - name: Build-only npm cache excluded
+    path: /root/.npm
+    shouldExist: false
+
+metadataTest:
+  user: 101:101
+  exposedPorts:
+    - "8080"
+    - "8443"
+  entrypoint:
+    - /usr/sbin/nginx
+  cmd:
+    - -c
+    - /etc/nginx/nginx.conf
+    - -e
+    - /dev/stderr
+    - -g
+    - daemon off;
+  labels:
+    - key: org.opencontainers.image.licenses
+      value: MIT
+    - key: org.opencontainers.image.source
+      value: https://github.com/RafaelVVolkmer/fork-fibonatto.github.io
+
+# EOF

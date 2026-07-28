@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Sergio Bonatto
+# SPDX-License-Identifier: MIT
+
+---
+# Layer-efficiency thresholds for every published image.
+rules:
+  lowestEfficiency: 0.9
+  highestWastedBytes: 20MB
+  highestUserWastedPercent: 0.1
+
+# EOF

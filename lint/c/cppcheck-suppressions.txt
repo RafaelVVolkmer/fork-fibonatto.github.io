@@ -1,8 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Sergio Bonatto
 # SPDX-License-Identifier: MIT
 
+# Project-owned suppressions for independent C static analysis.
 # Intentional standalone allocation example retained byte-for-byte from upstream.
 memleak:core/src/heart.c:13
 
 # qsort receives zero elements when slug_order has not been initialized.
-uninitvar:tools/packer/src/packer.c:285
+uninitvar:tools/packer/src/packer.c:306

@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Sergio Bonatto
 # SPDX-License-Identifier: MIT
 
+# Link validation policy for Markdown and published HTML.
 accept = [
   "100..=103",
   "200..=299",

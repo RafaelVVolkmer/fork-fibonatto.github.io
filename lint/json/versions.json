@@ -1,0 +1,93 @@
+{
+  "actionlint": {
+    "binary": "actionlint",
+    "archive": "tar.gz",
+    "sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+    "url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+    "version": "1.7.12"
+  },
+  "conftest": {
+    "archive": "tar.gz",
+    "binary": "conftest",
+    "sha256": "e8144c6d6d2ae0260b869caa60c7c262a1f95ac63ec1e5d2fb19be452d606347",
+    "url": "https://github.com/open-policy-agent/conftest/releases/download/v0.68.2/conftest_0.68.2_Linux_x86_64.tar.gz",
+    "version": "0.68.2"
+  },
+  "container-structure-test": {
+    "archive": "binary",
+    "binary": "container-structure-test",
+    "sha256": "fa35e89512a8978585f76cf41397956d2e3a30c62c2ad3fb857b1597074d14ca",
+    "url": "https://github.com/GoogleContainerTools/container-structure-test/releases/download/v1.22.1/container-structure-test-linux-amd64",
+    "version": "1.22.1"
+  },
+  "dive": {
+    "archive": "tar.gz",
+    "binary": "dive",
+    "sha256": "0970549eb4a306f8825a84145a2534153badb4d7dcf3febd1967c706367c3d0e",
+    "url": "https://github.com/wagoodman/dive/releases/download/v0.13.1/dive_0.13.1_linux_amd64.tar.gz",
+    "version": "0.13.1"
+  },
+  "dockle": {
+    "archive": "tar.gz",
+    "binary": "dockle",
+    "sha256": "8bfc9183d1d3d67800edb45bea4bb63ddf1d28bec5f89944075a07007d79caad",
+    "url": "https://github.com/goodwithtech/dockle/releases/download/v0.4.15/dockle_0.4.15_Linux-64bit.tar.gz",
+    "version": "0.4.15"
+  },
+  "grype": {
+    "archive": "tar.gz",
+    "binary": "grype",
+    "sha256": "40aff724297312f91ea390d003bed8d8651c74cc7f5b26732db80b3a408d2fc5",
+    "url": "https://github.com/anchore/grype/releases/download/v0.116.0/grype_0.116.0_linux_amd64.tar.gz",
+    "version": "0.116.0"
+  },
+  "hadolint": {
+    "archive": "binary",
+    "binary": "hadolint",
+    "sha256": "6bf226944684f56c84dd014e8b979d27425c0148f61b3bd99bcc6f39e9dc5a47",
+    "url": "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-x86_64",
+    "version": "2.14.0"
+  },
+  "lychee": {
+    "archive": "tar.gz",
+    "binary": "lychee",
+    "sha256": "1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a",
+    "url": "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-unknown-linux-gnu.tar.gz",
+    "version": "0.24.2"
+  },
+  "rumdl": {
+    "archive": "tar.gz",
+    "binary": "rumdl",
+    "sha256": "01e0dd2d89c07d244c5c93243f7faf2986d2abec68a7cec458e38c25988fbabc",
+    "url": "https://github.com/rvben/rumdl/releases/download/v0.2.43/rumdl-v0.2.43-x86_64-unknown-linux-gnu.tar.gz",
+    "version": "0.2.43"
+  },
+  "shfmt": {
+    "archive": "binary",
+    "binary": "shfmt",
+    "sha256": "fb096c5d1ac6beabbdbaa2874d025badb03ee07929f0c9ff67563ce8c75398b1",
+    "url": "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_amd64",
+    "version": "3.13.1"
+  },
+  "taplo": {
+    "archive": "gz",
+    "binary": "taplo",
+    "sha256": "8fe196b894ccf9072f98d4e1013a180306e17d244830b03986ee5e8eabeb6156",
+    "url": "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz",
+    "version": "0.10.0"
+  },
+  "trivy": {
+    "archive": "tar.gz",
+    "binary": "trivy",
+    "sha256": "bbb64b9695866ce4a7a8f5c9592002c5961cab378577fa3f8a040df362b9b2ea",
+    "url": "https://github.com/aquasecurity/trivy/releases/download/v0.72.0/trivy_0.72.0_Linux-64bit.tar.gz",
+    "version": "0.72.0"
+  },
+  "typos": {
+    "archive": "tar.gz",
+    "binary": "typos",
+    "sha256": "72a930c9a94fc3914aa56835c5b859c892a797d40c1c42638b98d93f16ff519c",
+    "url": "https://github.com/crate-ci/typos/releases/download/v1.48.0/typos-v1.48.0-x86_64-unknown-linux-musl.tar.gz",
+    "version": "1.48.0"
+  }
+}

@@ -34,6 +34,7 @@ available_checks=(
 	jsonlint
 	markdownlint
 	actionlint
+	dockerfile
 	lychee
 	typos
 	clang-format
@@ -95,7 +96,7 @@ done
 # Deterministic file inventories
 # ------------------------------------------------------------------------------
 mapfile -d '' shell_files < <(
-	find scripts lint -type f -name '*.sh' -print0 | sort -z
+	find scripts lint docker -type f -name '*.sh' -print0 | sort -z
 )
 mapfile -d '' yaml_files < <(
 	find .github lint -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | sort -z
@@ -124,7 +125,15 @@ mapfile -d '' link_files < <(
 shfmt_flags=()
 while IFS= read -r flag; do
 	[[ -n "$flag" && "$flag" != \#* ]] && shfmt_flags+=("$flag")
-done < "$lint_dir/shfmt.args"
+done < "$lint_dir/shell/shfmt.args"
+
+# ------------------------------------------------------------------------------
+# JSON parser policy
+# ------------------------------------------------------------------------------
+jq_flags=()
+while IFS= read -r flag; do
+	[[ -n "$flag" && "$flag" != \#* ]] && jq_flags+=("$flag")
+done < "$lint_dir/json/jq.args"
 
 # ------------------------------------------------------------------------------
 # Shell checks
@@ -133,7 +142,7 @@ check_shellcheck() {
 	local severity
 
 	severity="$(
-		sed -n 's/^severity=//p' "$lint_dir/shellcheckrc"
+		sed -n 's/^severity=//p' "$lint_dir/shell/shellcheckrc"
 	)"
 	shellcheck \
 		--severity="$severity" \
@@ -150,18 +159,24 @@ check_shell_format() {
 # YAML, TOML and JSON checks
 # ------------------------------------------------------------------------------
 check_yaml() {
-	yamllint --strict --config-file "$lint_dir/yamllint.yml" "${yaml_files[@]}"
+	yamllint \
+		--strict \
+		--config-file "$lint_dir/yml/yamllint.yml" \
+		"${yaml_files[@]}"
 }
 
 check_toml() {
-	taplo lint --config "$lint_dir/taplo.toml" --no-auto-config "${toml_files[@]}"
+	taplo lint \
+		--config "$lint_dir/toml/taplo.toml" \
+		--no-auto-config \
+		"${toml_files[@]}"
 }
 
 check_json() {
 	local path
 
 	for path in "${json_files[@]}"; do
-		jq --exit-status . "$path" > /dev/null
+		jq "${jq_flags[@]}" . "$path" > /dev/null
 	done
 }
 
@@ -178,7 +193,7 @@ check_markdown() {
 	)"
 
 	rumdl check \
-		--config "$lint_dir/rumdl.toml" \
+		--config "$lint_dir/md/rumdl.toml" \
 		README.md \
 		lint/README.md || return
 
@@ -192,18 +207,22 @@ check_markdown() {
 
 check_actions() {
 	actionlint \
-		-config-file "$lint_dir/actionlint.yaml" \
+		-config-file "$lint_dir/compliance/actionlint.yaml" \
 		-shellcheck shellcheck \
 		"${workflow_files[@]}"
 }
 
+check_dockerfile() {
+	"$project_root/scripts/tests/docker_test.sh" lint
+}
+
 check_links() {
-	lychee --config "$lint_dir/lychee.toml" "${link_files[@]}"
+	lychee --config "$lint_dir/md/lychee.toml" "${link_files[@]}"
 }
 
 check_typos() {
 	typos \
-		--config "$lint_dir/typos.toml" \
+		--config "$lint_dir/compliance/typos.toml" \
 		--isolated \
 		--force-exclude \
 		.
@@ -216,7 +235,7 @@ check_clang_format() {
 	clang-format \
 		--dry-run \
 		--Werror \
-		--style="file:$lint_dir/clang-format.yml" \
+		--style="file:$lint_dir/c/clang-format.yml" \
 		"${c_files[@]}"
 }
 
@@ -244,7 +263,7 @@ check_clang_tidy() {
 	# differences in warning-option recognition during this secondary analysis.
 	clang-tidy \
 		--quiet \
-		--config-file="$lint_dir/clang-tidy.yml" \
+		--config-file="$lint_dir/c/clang-tidy.yml" \
 		-p "$project_root" \
 		--extra-arg=-Wno-unknown-warning-option \
 		--extra-arg=-Wno-unused-command-line-argument \
@@ -252,13 +271,13 @@ check_clang_tidy() {
 
 	clang-tidy \
 		--quiet \
-		--config-file="$lint_dir/clang-tidy.yml" \
+		--config-file="$lint_dir/c/clang-tidy.yml" \
 		core/src/heart.c \
 		-- -std=c11 || return
 
 	clang-tidy \
 		--quiet \
-		--config-file="$lint_dir/clang-tidy.yml" \
+		--config-file="$lint_dir/c/clang-tidy.yml" \
 		tools/packer/src/packer.c \
 		-- -std=c11 -Itools/packer/inc
 }
@@ -272,8 +291,8 @@ check_cppcheck() {
 		--language=c \
 		--std=c11 \
 		--suppress=missingIncludeSystem \
-		--suppressions-list="$lint_dir/cppcheck-suppressions.txt" \
-		-Ilint \
+		--suppressions-list="$lint_dir/c/cppcheck-suppressions.txt" \
+		-I"$lint_dir/c" \
 		-Icore/inc \
 		-I.build/generated \
 		-Itools/packer/inc \
@@ -334,6 +353,9 @@ for check in "${requested_checks[@]}"; do
 			;;
 		actionlint)
 			run_check "$check" actionlint check_actions
+			;;
+		dockerfile)
+			run_check "$check" docker check_dockerfile
 			;;
 		lychee)
 			run_check "$check" lychee check_links

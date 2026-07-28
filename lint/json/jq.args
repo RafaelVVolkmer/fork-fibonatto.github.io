@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Sergio Bonatto
 # SPDX-License-Identifier: MIT
 
-severity=warning
-external-sources=true
-source-path=SCRIPTDIR
+# Treat false and null roots as validation failures.
+--exit-status
+
+# EOF

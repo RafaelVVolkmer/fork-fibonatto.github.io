@@ -13,10 +13,13 @@
 	#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
+// EM_JS bodies contain JavaScript tokens that are not valid C operators.
+// clang-format off
+
 // From sys.c
 EM_JS(int, sys_load_theme, (void), {
 	const val = localStorage.getItem('site-theme');
-	return (val == = 'dark') ? 1 : 0;
+	return (val === 'dark') ? 1 : 0;
 });
 
 EM_JS(void, sys_save_theme, (int is_dark), {
@@ -35,8 +38,8 @@ EM_JS(void, sys_set_html, (const char *sel_ptr, const char *html_ptr), {
 	const fragment = range.createContextualFragment(html);
 	el.replaceChildren(fragment);
 
-	if (sel == = '#feed') {
-		el.querySelectorAll('.img-placeholder').forEach(ph = > {
+	if (sel === '#feed') {
+		el.querySelectorAll('.img-placeholder').forEach(ph => {
 			const src = ph.dataset.src;
 			const img = new Image( );
 			img.src	  = src;
@@ -58,7 +61,7 @@ EM_JS(void, sys_set_html, (const char *sel_ptr, const char *html_ptr), {
 			if (ph.dataset.scale) {
 				const scale	= parseFloat(ph.dataset.scale);
 				img.style.width = "auto";
-				img.onload = ( ) = > {
+				img.onload = ( ) => {
 					img.style.width
 					    = (img.naturalWidth * scale) + "px";
 				};
@@ -85,7 +88,7 @@ EM_JS(void, sys_set_style, (const char *sel_ptr, const char *css_ptr), {
 	const sel = UTF8ToString(sel_ptr);
 	const css = UTF8ToString(css_ptr);
 	const els = document.querySelectorAll(sel);
-	els.forEach(el = > el.style.cssText = css);
+	els.forEach(el => el.style.cssText = css);
 });
 
 EM_JS(void, sys_scroll_to_bottom, (const char *sel_ptr), {
@@ -97,14 +100,14 @@ EM_JS(void, sys_scroll_to_bottom, (const char *sel_ptr), {
 
 EM_JS(void, sys_init_router, (void), {
 	window.addEventListener(
-	    'popstate', ( ) = > {
+	    'popstate', ( ) => {
 		    if (Module._handle_current_route) {
 			    Module._handle_current_route( );
 		    }
 	    });
 
 	window.addEventListener(
-	    'hashchange', ( ) = > {
+	    'hashchange', ( ) => {
 		    if (Module._handle_current_route) {
 			    Module._handle_current_route( );
 		    }
@@ -133,10 +136,9 @@ EM_JS(void,
 
 	      document.title = title;
 
-	      const setMeta = (attr, name, content) = > {
-		      let el = document.querySelector(`meta[${attr} = "${"
-								      "name"
-								      "}"]`);
+	      const setMeta = (attr, name, content) => {
+		      let el =
+			  document.querySelector(`meta[${attr} = "${name}"]`);
 		      if (!el) {
 			      el = document.createElement('meta');
 			      el.setAttribute(attr, name);
@@ -228,8 +230,8 @@ EM_JS(void,
 		      return;
 
 	      const rootStyle  = document.documentElement.style;
-	      const getPalette = (idx) =
-		  > UTF8ToString(HEAP32[(palette >> 2) + idx]);
+	      const getPalette = (idx) =>
+		  UTF8ToString(HEAP32[(palette >> 2) + idx]);
 
 	      /* t layout: bg(0), text(4), dim(8), accent(12), code_bg(16),
 	       * code_border(20) */
@@ -258,7 +260,7 @@ EM_JS(void,
 	      Module.gfx.bg	   = bg;
 	      Module.gfx.textColor = text;
 
-	      if (bg_idx == = 0) {
+	      if (bg_idx === 0) {
 		      document.documentElement.classList.add('dark-theme');
 		      localStorage.setItem('site-theme', 'dark');
 	      } else {
@@ -281,7 +283,7 @@ EM_JS(void, init_graphics, (const struct theme *t, int header_h), {
 		textColor: ""
 	};
 
-	const onResize = ( ) = > {
+	const onResize = ( ) => {
 		const dpr   = window.devicePixelRatio || 1;
 		const width = Math.max(1, Math.floor(window.innerWidth * dpr));
 		const height
@@ -302,7 +304,7 @@ EM_JS(void, init_graphics, (const struct theme *t, int header_h), {
 	// Ensure font is loaded then redraw
 	if (document.fonts) {
 		document.fonts.load("700 60px 'Latin Modern Roman'")
-		    .then(( ) = > {
+		    .then(( ) => {
 			    if (Module._draw_frame)
 				    Module._draw_frame( );
 		    });
@@ -315,8 +317,8 @@ EM_JS(void,
       {
 	      if (!Module.gfx)
 		      return;
-	      const getPalette = (idx) =
-		  > UTF8ToString(HEAP32[(palette >> 2) + idx]);
+	      const getPalette = (idx) =>
+		  UTF8ToString(HEAP32[(palette >> 2) + idx]);
 
 	      Module.gfx.label	   = UTF8ToString(label_ptr);
 	      Module.gfx.textColor = getPalette(text_color_idx);
@@ -344,7 +346,7 @@ EM_JS(void, apply_style, (const char *selector_cstr, const char *style_cstr), {
 	const selector = UTF8ToString(selector_cstr);
 	const style    = UTF8ToString(style_cstr);
 	const elements = document.querySelectorAll(selector);
-	elements.forEach(el = > el.style.cssText = style);
+	elements.forEach(el => el.style.cssText = style);
 });
 
 EM_JS(void, draw_frame, (void), {
@@ -399,7 +401,7 @@ EM_JS(void,
 	      btn.textContent	= label;
 	      btn.style.cssText = style;
 
-	      btn.onclick = ( ) = > {
+	      btn.onclick = ( ) => {
 		      if (Module._ui_toggle_theme) {
 			      Module._ui_toggle_theme( );
 		      }
@@ -428,9 +430,9 @@ EM_JS(void,
 	      btn.textContent	= label;
 	      btn.style.cssText = style;
 
-	      btn.onclick = ( ) = > {
+	      btn.onclick = ( ) => {
 		      if (Module._switch_page) {
-			      Module._switch_page(is_blog != = 0);
+			      Module._switch_page(is_blog !== 0);
 		      }
 	      };
 
@@ -447,6 +449,8 @@ EM_JS(void,
 	      if (btn)
 		      btn.textContent = label;
       });
+
+// clang-format on
 
 #if defined(__clang__)
 	#pragma clang diagnostic pop

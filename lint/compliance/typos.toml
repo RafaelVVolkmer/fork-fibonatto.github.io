@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Sergio Bonatto
 # SPDX-License-Identifier: MIT
 
+# Repository-wide spelling policy.
 [files]
 extend-exclude = [
   ".build/**",

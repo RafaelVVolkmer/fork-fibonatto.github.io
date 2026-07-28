@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 ---
+# Canonical formatting policy for project-owned C sources.
 # ==============================================================================
 # 1. Base style
 # ==============================================================================
