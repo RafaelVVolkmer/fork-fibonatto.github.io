@@ -140,7 +140,8 @@ This command:
 9. Runs Binaryen optimization and Terser minification.
 10. Assembles and validates the complete website in `dist/`.
 11. Generates the sitemap and Brotli sidecar files.
-12. Publishes the canonical compilation database in `dist/.metadata/`.
+12. Publishes the canonical compilation database and source digest inventory
+    in `dist/.metadata/`.
 13. Uses local Syft, when available, to generate formatted CycloneDX and SPDX
     JSON inventories.
 14. Verifies that the final JavaScript and WebAssembly filename hashes match
@@ -155,13 +156,12 @@ This command:
 The audit report is written to `.build/audit/release-flags.txt`. A failed flag
 stops the release instead of being silently ignored.
 
-`core/sources.sha256` records the expected digest of every project-owned `.c`
-and `.h` file, including the packer. `make update-sources` regenerates the
-complete, deterministically sorted inventory. The audit compares the generated
-manifest byte-for-byte with the committed file, so added and removed sources
-are detected alongside content changes. `make validate`, `make release`, and
-the Pages CI workflow require this check; `make build` remains an unblocked
-development loop.
+The source audit requires every project-owned `.c` and `.h` file, including
+the packer, to be tracked by Git. `make validate`, `make release`, and the
+Pages CI workflow enforce that inventory boundary, while `make build` remains
+an unblocked development loop. Packaging generates the complete,
+deterministically sorted `dist/.metadata/sources.sha256`; `make
+update-sources` writes the same inventory to `.build/audit/` for local review.
 
 Project-owned C compiles with the supported warning set promoted to errors.
 Diagnostics intrinsic to Emscripten's `EM_JS` macro expansion are suppressed
@@ -259,11 +259,11 @@ inventories under `dist/.metadata/`.
 
 After a successful release, the build log and each passing test log from the
 same invocation are copied from `logs/` into `dist/.metadata/logs/`. A
-`release.sha256` manifest covers the deployed site, SBOMs, and evidence logs.
-Cosign signs that manifest with `COSIGN_KEY` when supplied, or keylessly through
-GitHub Actions OIDC. Local builds without either identity remain successful and
-write a formatted `cosign.status.json` explaining why no signature bundle was
-created.
+`release.sha256` manifest covers the deployed site, source digest inventory,
+SBOMs, and evidence logs. Cosign signs that manifest with `COSIGN_KEY` when
+supplied, or keylessly through GitHub Actions OIDC. Local builds without either
+identity remain successful and write a formatted `cosign.status.json`
+explaining why no signature bundle was created.
 
 `make tests` first checks that the hexadecimal prefixes in the final
 `app.<hash>.js` and `app.<hash>.wasm` names match their respective SHA-256
@@ -349,10 +349,10 @@ available to Emscripten's compiler, runtime settings, `wasm-ld`, and Binaryen.
 `.build/` and `dist/` are generated and intentionally ignored by Git.
 `logs/` is generated, ignored, and managed through `make logs-clean`.
 
-The source-integrity manifest covers the runtime sources, host-side packer, and
-standalone `heart.c`. The root Makefile selects the runtime translation units
-explicitly, delegates `packer.c` to its own Makefile, and does not include
-`heart.c` in either target.
+The generated source-integrity manifest covers the runtime sources, host-side
+packer, and standalone `heart.c`. `mk/config.mk` selects the runtime
+translation units explicitly, delegates `packer.c` to its own Makefile, and
+does not include `heart.c` in either target.
 
 ## Adding a post
 
@@ -426,6 +426,7 @@ dist/
 │   ├── release.sha256
 │   ├── sbom.cyclonedx.json
 │   ├── sbom.spdx.json
+│   ├── sources.sha256
 │   └── logs/
 │       ├── build/
 │       └── tests/
@@ -443,8 +444,8 @@ dist/
 └── REUSE.toml
 ```
 
-No source files, object files, or editor caches are copied to `dist/`; the
-compilation database is the deliberate metadata exception.
+No source bodies, object files, or editor caches are copied to `dist/`; the
+compilation database and source digest inventory are deliberate metadata.
 
 ## GitHub Pages
 
@@ -455,7 +456,8 @@ an OIDC identity to create a keyless signature bundle. Pull requests run the
 complete release plus the two-build reproducibility check without deploying.
 Pushes to `main` or `develop` upload `dist/` as the Pages artifact and deploy that exact
 artifact. The SBOMs are published at
-`/.metadata/sbom.cyclonedx.json` and `/.metadata/sbom.spdx.json`.
+`/.metadata/sbom.cyclonedx.json` and `/.metadata/sbom.spdx.json`; the signed
+source inventory is published at `/.metadata/sources.sha256`.
 
 The canonical public origin is stored in `site/url.txt`. Because `dist/` is the
 Pages document root, `dist/sitemap.xml` is published as `/sitemap.xml`; the

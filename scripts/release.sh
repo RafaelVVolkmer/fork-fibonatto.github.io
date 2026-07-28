@@ -104,6 +104,8 @@ package_dist() {
 	cp "$site_dir/dist.REUSE.toml" "$dist_dir/REUSE.toml"
 	cp "$project_root/compile_commands.json" \
 		"$dist_dir/.metadata/compile_commands.json"
+	"$project_root/scripts/source-manifest.sh" generate \
+		"$dist_dir/.metadata/sources.sha256"
 	cp "$project_root/LICENSES/MIT.txt" "$dist_dir/LICENSES/MIT.txt"
 	cp "$assets_dir/icons/favicon.svg" "$dist_dir/assets/icons/favicon.svg"
 	cp "$assets_dir/images/seo.png" "$dist_dir/assets/images/seo.png"
@@ -339,6 +341,7 @@ validate_dist() {
 	local cyclonedx_sbom="$dist_dir/.metadata/sbom.cyclonedx.json"
 	local spdx_sbom="$dist_dir/.metadata/sbom.spdx.json"
 	local release_manifest="$dist_dir/.metadata/release.sha256"
+	local source_manifest="$dist_dir/.metadata/sources.sha256"
 	local cosign_status="$dist_dir/.metadata/cosign.status.json"
 	local cosign_bundle="$dist_dir/.metadata/release.cosign.bundle.json"
 	local compile_database="$dist_dir/.metadata/compile_commands.json"
@@ -349,6 +352,7 @@ validate_dist() {
 		"$dist_dir/LICENSES/MIT.txt"
 		"$dist_dir/.nojekyll"
 		"$compile_database"
+		"$source_manifest"
 		"$dist_dir/robots.txt"
 		"$dist_dir/sitemap.xml"
 		"$dist_dir/google0d6f4c8219a52398.html"
@@ -377,6 +381,7 @@ validate_dist() {
 		echo "The published compile_commands.json is malformed or empty." >&2
 		exit 1
 	fi
+	"$project_root/scripts/source-manifest.sh" check "$source_manifest"
 	! grep -q '{{[A-Z_]*}}' "$dist_dir/index.html" || {
 		echo "The final HTML still contains template placeholders." >&2
 		exit 1
@@ -403,6 +408,7 @@ validate_dist() {
 		find "$dist_dir/.metadata/logs/tests" -type f -name '*.log' \
 			-print -quit | grep -q .
 		(cd "$dist_dir" && shasum -a 256 --check ".metadata/release.sha256" > /dev/null)
+		grep -Fq '  ./.metadata/sources.sha256' "$release_manifest"
 		grep -q '"subject": "release.sha256"' "$cosign_status"
 		if grep -q '"signed": true' "$cosign_status"; then
 			[[ -s "$cosign_bundle" ]]

@@ -66,6 +66,21 @@ for (const [path, property, expected] of metadataChecks) {
   }
 }
 
+const sourceManifestPath = ".metadata/sources.sha256";
+const sourceManifestResponse = await fetch(new URL(sourceManifestPath, response.url));
+if (!sourceManifestResponse.ok) {
+  throw new Error(`${sourceManifestPath} returned HTTP ${sourceManifestResponse.status}`);
+}
+const sourceManifestLines = (await sourceManifestResponse.text()).trim().split("\n");
+const sourceManifestPattern =
+  /^[0-9a-f]{64}  (?:core|tools\/packer)\/.+\.(?:c|h)$/u;
+if (
+  sourceManifestLines.length === 0 ||
+  !sourceManifestLines.every((line) => sourceManifestPattern.test(line))
+) {
+  throw new Error(`${sourceManifestPath} is malformed`);
+}
+
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();
 const pageErrors = [];

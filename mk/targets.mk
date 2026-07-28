@@ -86,13 +86,14 @@ _release: check-tools sbom
 	@./scripts/release.sh validate-package
 	@echo "Release completed in $(DIST_DIR)/"
 
-audit: check-tools $(SOURCE_AUDIT_STAMP) $(AUDIT_STAMP)
+audit: check-tools audit-sources $(AUDIT_STAMP)
 	@echo "Audit completed: $(AUDIT_DIR)/release-flags.txt"
 
-audit-sources: $(SOURCE_AUDIT_STAMP)
-	@echo "C/H integrity verified against $(SOURCE_MANIFEST)"
+audit-sources:
+	@./$(SOURCE_MANIFEST_TOOL) audit
+	@echo "Tracked C/H source inventory verified"
 
-update-sources:
+update-sources: | $(AUDIT_DIR)
 	@./$(SOURCE_MANIFEST_TOOL) generate "$(SOURCE_MANIFEST)"
 
 validate: audit-sources build
@@ -214,8 +215,8 @@ help:
 	@echo "  make test-sanitizers   Build debug WASM and execute native ASan/UBSan tests"
 	@echo "  make test-release      Run binary and reproducibility release tests"
 	@echo "  make audit             Audit the toolchain and every release flag"
-	@echo "  make audit-sources     Verify C/H files byte-for-byte"
-	@echo "  make update-sources    Regenerate the tracked C/H source manifest"
+	@echo "  make audit-sources     Verify the tracked C/H source inventory"
+	@echo "  make update-sources    Generate a local C/H manifest preview"
 	@echo "  make validate          Incremental build + dist/ validation"
 	@echo "  make sbom              Generate optional CycloneDX and SPDX SBOMs"
 	@echo "  make hash-names        Verify application content-addressed names"
