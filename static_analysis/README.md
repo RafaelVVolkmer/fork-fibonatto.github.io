@@ -81,7 +81,7 @@ Configuration is grouped by the source or assurance domain it validates:
 | `compliance/` | Actions, spelling, and SBOM policies |
 
 The installer lives with the other executable helpers under `scripts/`;
-`static/` contains only declarative policy and its documentation.
+`static_analysis/` contains only declarative policy and its documentation.
 
 Repository documentation uses the configured Markdown rule set. Existing
 published posts retain their original typography and are checked against a
@@ -108,4 +108,4 @@ prose.
 
 The lint workflow downloads pinned Linux x86-64 release binaries into the
 runner's temporary directory and verifies every SHA-256 digest from
-the root `versions.json`. Nothing is installed globally.
+`static_analysis/versions.json`. Nothing is installed globally.

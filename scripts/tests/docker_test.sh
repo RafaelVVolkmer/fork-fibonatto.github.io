@@ -20,7 +20,7 @@ project_root="$(
 readonly project_root
 readonly dockerfile="$project_root/docker/Dockerfile"
 readonly compose_file="$project_root/docker/compose.yml"
-readonly analysis_dir="$project_root/static"
+readonly analysis_dir="$project_root/static_analysis"
 readonly docker_analysis_dir="$analysis_dir/docker"
 readonly audit_cache="$project_root/.cache/container-audit"
 readonly checkov_image="bridgecrew/checkov:3.3.8@sha256:c64ffb6d6fc8087c896341a2c697770a04a1cf558db04fa7b8129d8ca6bce336"
@@ -80,7 +80,7 @@ lint_definitions() {
 		--volume "$project_root:/workspace:ro" \
 		--workdir /workspace \
 		"$checkov_image" \
-		--config-file static/docker/checkov.yml
+		--config-file static_analysis/docker/checkov.yml
 	pass "Checkov Dockerfile policies"
 
 	conftest test \

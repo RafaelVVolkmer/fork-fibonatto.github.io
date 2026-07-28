@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # Shared TOML syntax and formatting policy.
-include = ["static/**/*.toml"]
+include = ["static_analysis/**/*.toml"]
 
 [formatting]
 align_comments = true

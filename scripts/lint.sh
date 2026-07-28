@@ -9,7 +9,7 @@
 # - Runs native system tools for shell, data, documentation and workflow checks.
 # - Provides optional C formatting and static-analysis checks for explicit use.
 # - Accepts "all" or one or more named checks and reports an aggregate result.
-# - Reads policies from static/ without installing or changing tools.
+# - Reads policies from static_analysis/ without changing tools.
 # ==============================================================================
 
 # The runner intentionally omits errexit so independent checks continue after a
@@ -20,7 +20,7 @@ set -uo pipefail
 # Repository root and static-analysis configuration directory
 # ------------------------------------------------------------------------------
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-analysis_dir="$project_root/static"
+analysis_dir="$project_root/static_analysis"
 cd "$project_root" || exit 1
 
 # ------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ mapfile -d '' toml_files < <(
 	find "$analysis_dir" -type f -name '*.toml' -print0 | sort -z
 )
 mapfile -d '' json_files < <(
-	find versions.json "$analysis_dir" -type f -name '*.json' -print0 | sort -z
+	find "$analysis_dir" -type f -name '*.json' -print0 | sort -z
 )
 mapfile -d '' workflow_files < <(
 	find .github/workflows -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | sort -z
@@ -196,7 +196,7 @@ check_markdown() {
 	rumdl check \
 		--config "$analysis_dir/md/rumdl.toml" \
 		README.md \
-		static/README.md || return
+		static_analysis/README.md || return
 
 	# Published posts retain their existing typography. Audit only rules that
 	# detect malformed Markdown without mechanically rewriting article prose.

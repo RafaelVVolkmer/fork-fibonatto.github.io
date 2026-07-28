@@ -59,7 +59,7 @@ The host must provide:
 - Syft (optional; used to generate the two SBOMs)
 - Cosign (optional locally; required and pinned in GitHub Actions)
 - ClangFormat, Clang-Tidy, Cppcheck, ShellCheck, yamllint, `jq`, and the
-  standalone lint tools pinned in `versions.json`
+  standalone lint tools pinned in `static_analysis/versions.json`
 
 On Ubuntu or Debian:
 
@@ -300,7 +300,7 @@ executables for ShellCheck, shell formatting, YAML, TOML, JSON, Markdown,
 GitHub Actions, links, spelling, Clang formatting/static analysis, and
 Cppcheck, plus a digest-pinned Checkov container for Dockerfile policy checks.
 Docker shell programs are included in the ShellCheck and shfmt inventories.
-See `static/README.md` for selectors and prerequisites.
+See `static_analysis/README.md` for selectors and prerequisites.
 
 Build commands can be overridden when tools are installed under different
 names:
@@ -354,7 +354,7 @@ available to Emscripten's compiler, runtime settings, `wasm-ld`, and Binaryen.
 │       └── Makefile        Standalone release/debug build
 ├── scripts/                Build, audit, packaging, and validation helpers
 ├── mk/                     Ordered GNU Make configuration and build fragments
-├── static/                 Analysis policies grouped by source domain
+├── static_analysis/        Analysis policies grouped by source domain
 ├── logs/                   Ignored per-profile Make invocation logs
 ├── .github/workflows/      GitHub Pages build and deployment
 ├── .build/                 Disposable generated headers and intermediates
